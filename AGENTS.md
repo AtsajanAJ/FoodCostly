@@ -1,12 +1,13 @@
 FoodCostly --- AI Agent Context
 Read this file before planning, coding, reviewing, or modifying this
 repository. This file explains what the product is and how an AI
-coding agent should work. Status: Draft v1.0 | Last updated:
+coding agent should work. Status: Draft v1.1 | Last updated:
 2026-11-19
 
 1. What Is This Project?
 FoodCostly is a multi-tenant SaaS web application for restaurants and
-food businesses.
+food businesses. Each organization represents one restaurant/business
+location in the MVP; multi-branch operation is explicitly deferred.
 
 It helps each business: - Record ingredient purchases and supplier
 information. - Convert purchase units to inventory base units. - Track
@@ -46,11 +47,14 @@ significant changes.
 - Lucide React
 - Vitest
 - Playwright
-- pnpm
+- bun (official package manager; lockfile: bun.lock)
 - Vercel deployment target
 Do not silently replace these technologies. If a change appears
 necessary, explain the trade-off and ask for approval before changing
 the stack.
+Use Bun for all package and script commands (`bun install`, `bun add`,
+`bun remove`, `bun run …`, `bunx …`). Do not use npm, yarn, or pnpm in
+this repository. Commit `bun.lock` with dependency changes.
 4. Architecture
 Use a modular monolith.
 - src/app: routes, layouts, pages, and thin Route Handlers.
@@ -108,8 +112,10 @@ A menu item is a sellable item that references a recipe or recipe
 composition and has channel-specific selling prices where required.
 Sales
 Sales record the channel, menu items, quantities, discounts, fees, and
-cost snapshots. Posting a sale may consume inventory.
-Cancellation/refund uses reversal records.
+cost snapshots. Saving a sale immediately consumes inventory in the
+same atomic transaction. If any ingredient is insufficient, reject the
+whole sale without saving any part. Cancellation/refund uses reversal
+records.
 Costing
 MVP costing method is Moving Weighted Average Cost (MWAC). Do not
 implement FIFO unless explicitly approved.
@@ -144,9 +150,16 @@ implement FIFO unless explicitly approved.
 - Protect against concurrent stock updates using database transactions
   and appropriate locking/consistency checks.
 - Keep stock balance reconciled with ledger movements.
-- Do not assume negative stock is allowed; follow the current
-  documented product policy.
-9. AI Agent Workflow
+- Negative stock is forbidden for all users and operations. Reject stock-consuming transactions that would produce a negative balance.
+- Sales deduct stock immediately when saved; sale creation and all stock ledger/balance updates must commit or roll back together.
+- Prevent race conditions with database-level transaction/locking or conditional updates and verify sufficient stock inside the transaction.
+9. Confirmed Product Decisions
+- One organization represents one restaurant location in MVP; no branch selector, branch transfers, or branch-level stock in this release.
+- Stock must never become negative. No Owner/Admin override exists.
+- A sale deducts stock immediately when saved. Insufficient stock rejects the entire sale atomically.
+- The UI supports Thai and English with a selectable locale and translation dictionaries.
+- Start with a Free plan. Paid subscriptions, payment provider integration, and billing automation are post-MVP.
+10. AI Agent Workflow
 Before coding: 1. Read agent.md, plan.md, and rule.md. 2. Inspect
 the existing repository and package versions. Do not assume the project
 is empty. 3. Identify the current milestone and only work on that scope.
@@ -167,24 +180,23 @@ After coding: 1. Run relevant tests. 2. Run lint and TypeScript checks.
 behavior added, commands run, test results, and known limitations. 5.
 Update documentation when architecture, schema, workflows, or decisions
 change.
-10. How to Handle Ambiguity
+11. How to Handle Ambiguity
 Do not invent business rules that affect stock, money, or historical
 records.
 
 Ask before implementing a non-reversible or financially significant
-choice, including: - Negative stock and override rules. - Tax, discount,
-and shipping cost allocation. - Whether sales consume stock on entry or
-posting. - Refund and cancellation behavior. - Ingredient yield and
-preparation loss. - Multi-branch stock ownership/transfers. -
-Subscription billing and entitlements.
+choice, including: - Tax, discount, and shipping cost allocation. -
+Refund and cancellation behavior. - Ingredient yield and preparation
+loss. - Exact role/permission matrix. - Whether receipt image uploads
+are in MVP. Do not reopen confirmed decisions unless new evidence
+reveals a material defect; explain the impact and request approval.
 
 For low-risk UI choices, use a consistent, accessible default and
 document it.
-11. Current Project Stage
-Initial planning and architecture definition.
+12. Current Project Stage
+Sprint 0: Project Foundation is now in progress. The confirmed product decisions above must be treated as requirements.
 
-The next planned milestone is Sprint 0: Project Foundation, followed
-by Sprint 1: Authentication and Tenant Isolation.
+Current milestone: Sprint 0: Project Foundation. Next: Sprint 1: Authentication and Tenant Isolation.
 
 Do not start advanced inventory, costing, sales, billing, or external
 integrations before the foundation and tenant boundary are working and
