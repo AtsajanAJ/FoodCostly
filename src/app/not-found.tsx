@@ -11,7 +11,9 @@ export default function NotFound() {
         </p>
       </div>
       <div>
-        <Button render={<Link href="/" />}>Go home</Button>
+        <Button render={<Link href="/" />} nativeButton={false}>
+          Go home
+        </Button>
       </div>
     </div>
   );

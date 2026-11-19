@@ -222,6 +222,8 @@ Database connection and migration work. - Secrets are not committed. -
 Local lint/type/test/build pass. Remote CI green deferred until GitHub
 billing is resolved.
 Sprint 1 --- Authentication and Tenant Isolation
+<small>Status: In progress — Better Auth + Organizations, tenant context, dashboard shell, and cross-tenant access tests underway.</small>
+
 Deliverables - Better Auth setup. - Organization creation and
 switching. - Organization membership and role checks. - Protected
 dashboard route. - Server-side tenant context helper.
