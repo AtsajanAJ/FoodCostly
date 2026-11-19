@@ -209,7 +209,7 @@ prematurely.
 The schedule is an estimate for one developer and should be adjusted
 after the first technical spike.
 Sprint 0 --- Product and Technical Foundation
-<small>Status: In progress — implementation starter prepared; repository/Neon integration pending.</small>
+<small>Status: In progress — Bun/Prisma/Neon/shadcn ready; app shell + folder layout + CI added; env validation present; close out after CI green on main.</small>
 
 Deliverables - Repository and project conventions. - Next.js,
 TypeScript strict mode, Tailwind, shadcn/ui. - Neon development

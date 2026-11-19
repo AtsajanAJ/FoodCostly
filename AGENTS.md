@@ -196,7 +196,7 @@ document it.
 12. Current Project Stage
 Sprint 0: Project Foundation is now in progress. The confirmed product decisions above must be treated as requirements.
 
-Current milestone: Sprint 0: Project Foundation. Next: Sprint 1: Authentication and Tenant Isolation.
+Current milestone: Sprint 0: Project Foundation (shell, folders, CI in place; finish env/CI verification then close). Next: Sprint 1: Authentication and Tenant Isolation.
 
 Do not start advanced inventory, costing, sales, billing, or external
 integrations before the foundation and tenant boundary are working and
