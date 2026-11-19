@@ -217,7 +217,21 @@ Sprint 6: Sales and Profitability is Done (2026-11-19).
 
 Sprint 7: Dashboard and Reports is Done (2026-11-19).
 
-Current milestone: Sprint 8: Hardening and Release.
+Sprint 8: Hardening and Release is Done (2026-11-19).
 
-Do not start billing or external marketplace/POS integrations in
-hardening; focus on tests, security review, and release readiness.
+Current milestone: MVP complete (Sprints 0–8). Post-MVP only with
+explicit approval (billing, POS/marketplace integrations, branches).
+
+Before merging: run `bun run lint`, `bun run typecheck`, `bun run test`,
+`bun run build`, and `bun run test:e2e` locally until GitHub Actions
+auto-CI is re-enabled.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

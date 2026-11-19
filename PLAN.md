@@ -302,6 +302,8 @@ identify whether figures are gross margin, contribution margin, or net
 profit. - No report claims net profit unless operating expenses are
 included.
 Sprint 8 --- Hardening and Release
+<small>Status: Done (2026-11-19) — Playwright smoke/auth-gate/register-onboard e2e, sale tenant isolation test, safe-log redaction, index/performance notes, Neon backup + Vercel deploy checklist, user guide. No billing/POS integrations.</small>
+
 Deliverables - Playwright critical-path tests. - Security review and
 tenant isolation review. - Performance review and database indexes. -
 Error monitoring. - Backup/recovery and deployment checklist. - User

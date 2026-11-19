@@ -6,6 +6,7 @@ import {
   createSaleSchema,
   updateChannelFeeSchema,
 } from "@/features/sales/schemas";
+import { reportError } from "@/lib/safe-log";
 import { requireTenantContext } from "@/server/permissions/tenant-context";
 import * as saleService from "@/server/services/sale-service";
 
@@ -28,6 +29,7 @@ export async function createSaleAction(input: unknown): Promise<ActionResult> {
     revalidatePath("/dashboard/inventory");
     return { ok: true, id: sale.id };
   } catch (error) {
+    reportError(error, { action: "createSaleAction" });
     return { ok: false, error: toErrorMessage(error) };
   }
 }
@@ -46,6 +48,7 @@ export async function cancelSaleAction(input: unknown): Promise<ActionResult> {
     revalidatePath("/dashboard/inventory");
     return { ok: true, id: sale.id };
   } catch (error) {
+    reportError(error, { action: "cancelSaleAction" });
     return { ok: false, error: toErrorMessage(error) };
   }
 }
@@ -63,6 +66,7 @@ export async function updateChannelFeeAction(
     revalidatePath("/dashboard/sales");
     return { ok: true };
   } catch (error) {
+    reportError(error, { action: "updateChannelFeeAction" });
     return { ok: false, error: toErrorMessage(error) };
   }
 }

@@ -18,40 +18,35 @@ export async function getSaleChannelForOrg(
 }
 
 export async function ensureDefaultChannels(organizationId: string) {
-  const defaults = [
-    {
-      code: "INSTORE",
-      name: "In-store",
-      feeType: "NONE" as const,
-      feeValue: "0",
-    },
-    {
-      code: "DELIVERY",
-      name: "Delivery",
-      feeType: "PERCENT" as const,
-      feeValue: "0",
-    },
-  ];
+  const existing = await listSaleChannels(organizationId);
+  if (existing.some((channel) => channel.code === "INSTORE") &&
+    existing.some((channel) => channel.code === "DELIVERY")) {
+    return existing;
+  }
 
-  for (const channel of defaults) {
-    await prisma.saleChannel.upsert({
-      where: {
-        organizationId_code: {
-          organizationId,
-          code: channel.code,
-        },
-      },
-      create: {
+  // createMany + skipDuplicates avoids P2002 races when the dashboard
+  // and other callers seed channels concurrently for a new org.
+  await prisma.saleChannel.createMany({
+    data: [
+      {
         id: randomUUID(),
         organizationId,
-        code: channel.code,
-        name: channel.name,
-        feeType: channel.feeType,
-        feeValue: channel.feeValue,
+        code: "INSTORE",
+        name: "In-store",
+        feeType: "NONE",
+        feeValue: "0",
       },
-      update: {},
-    });
-  }
+      {
+        id: randomUUID(),
+        organizationId,
+        code: "DELIVERY",
+        name: "Delivery",
+        feeType: "PERCENT",
+        feeValue: "0",
+      },
+    ],
+    skipDuplicates: true,
+  });
 
   return listSaleChannels(organizationId);
 }

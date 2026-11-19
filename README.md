@@ -40,12 +40,32 @@ Copy `.env.example` to `.env` and fill in Neon connection strings before running
 | Prisma generate | `bunx prisma generate` |
 | Prisma migrate | `bunx prisma migrate dev` |
 
+## Docs
+
+| Doc | Purpose |
+| --- | --- |
+| [docs/USER_GUIDE.md](docs/USER_GUIDE.md) | Operator how-to for MVP workflows |
+| [docs/RELEASE.md](docs/RELEASE.md) | Env, migrate, backup, deploy checklist |
+| [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md) | Sprint 8 tenant/security review notes |
+| [AGENTS.md](AGENTS.md) | AI/agent product + architecture context |
+| [PLAN.md](PLAN.md) | Milestones and acceptance criteria |
+| [RULES.md](RULES.md) | Engineering and product prohibitions |
+
+## E2E
+
+```bash
+bunx playwright install chromium
+bun run test:e2e
+```
+
+Playwright starts `bun run dev` unless a server is already on port 3000.
+
 ## CI note
 
 GitHub Actions auto-CI is **deferred** (account billing lock). The workflow
 file remains at `.github/workflows/ci.yml` but only supports manual
 `workflow_dispatch` until billing is fixed. Until then, run lint,
-typecheck, test, and build locally before merging.
+typecheck, test, build, and e2e locally before merging.
 
 ## Stack
 
