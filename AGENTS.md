@@ -213,7 +213,9 @@ Sprint 4: Inventory is Done (2026-11-19).
 
 Sprint 5: Recipes and Menu Costing is Done (2026-11-19).
 
-Current milestone: Sprint 6: Sales and Profitability.
+Sprint 6: Sales and Profitability is Done (2026-11-19).
 
-Do not start billing or external integrations before sales workflows are
-working and tested.
+Current milestone: Sprint 7: Dashboard and Reports.
+
+Do not start billing or external integrations before dashboard/report
+workflows are working and tested.

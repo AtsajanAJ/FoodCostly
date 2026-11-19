@@ -56,6 +56,17 @@ export async function applyStockMovement(
     throw new Error("Ingredient not found in this organization");
   }
 
+  // Lock balance row before outbound checks so concurrent sales cannot
+  // oversell the same quantity.
+  if (delta.lt(0)) {
+    await tx.$executeRaw`
+      SELECT 1 FROM "stock_balance"
+      WHERE "organizationId" = ${params.organizationId}
+        AND "ingredientId" = ${params.ingredientId}
+      FOR UPDATE
+    `;
+  }
+
   const existingBalance = await tx.stockBalance.findFirst({
     where: {
       organizationId: params.organizationId,

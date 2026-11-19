@@ -282,9 +282,13 @@ quantities.
 MVP yield assumption (open decision #2, reversible): edible yield % is
 stored on each recipe item; required raw qty = baseQty / (yield%/100).
 Sprint 6 --- Sales and Profitability
+<small>Status: Done (2026-11-19) — channels with NONE/PERCENT/FIXED fees, manual sale post with sale-time snapshots, atomic stock deduction + idempotency key, cancel/reversal, contribution margin (not labeled net profit).</small>
+
 Deliverables - Channel setup. - Manual sale entry. - Sale items and sale-time snapshots. - Percentage/fixed channel fees. - Immediate inventory deduction on sale save. - Cancellation and refund/reversal flow.
 
 Acceptance criteria - In-store and delivery sales can be recorded. - Saving a sale immediately deducts its recipe ingredients in the same database transaction. - If any ingredient is insufficient, reject the entire sale and leave sale records and stock unchanged. - Concurrent sale attempts cannot drive stock below zero. - Duplicate requests are idempotent and cannot deduct stock twice. - Profit calculations clearly separate food cost, packaging, channel fees, discounts, and other variable costs. - Cancellation/refund reverses relevant stock and financial effects without deleting history.
+
+MVP fee assumption (reversible): percent/fixed channel fees apply to net revenue (gross − discount).
 Sprint 7 --- Dashboard and Reports
 Deliverables - Dashboard KPIs. - Purchase reports. - Inventory and
 stock valuation reports. - Food cost and menu profitability reports. -

@@ -69,6 +69,13 @@ export default async function DashboardPage() {
         >
           Menus
         </Button>
+        <Button
+          variant="outline"
+          render={<Link href="/dashboard/sales" />}
+          nativeButton={false}
+        >
+          Sales
+        </Button>
       </div>
 
       <section className="space-y-2 rounded-lg border border-border p-4">

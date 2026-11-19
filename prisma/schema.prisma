@@ -98,6 +98,8 @@ model Organization {
   inventoryLedger  InventoryLedgerEntry[]
   recipes          Recipe[]
   menuItems        MenuItem[]
+  saleChannels     SaleChannel[]
+  sales            Sale[]
 
   @@unique([slug])
   @@map("organization")
@@ -174,6 +176,7 @@ model Ingredient {
   ledgerEntries      InventoryLedgerEntry[]
   recipeItems        RecipeItem[]
   versionItems       RecipeVersionItem[]
+  saleConsumptions   SaleStockConsumption[]
 
   @@unique([organizationId, name])
   @@index([organizationId, status])
@@ -208,6 +211,7 @@ model Recipe {
   items          RecipeItem[]
   versions       RecipeVersion[]
   menuItems      MenuItem[]
+  saleItems      SaleItem[]
 
   @@unique([organizationId, name])
   @@index([organizationId, status])
@@ -251,6 +255,7 @@ model RecipeVersion {
   createdAt       DateTime            @default(now())
   items           RecipeVersionItem[]
   menuItems       MenuItem[]
+  saleItems       SaleItem[]
 
   @@unique([recipeId, versionNumber])
   @@index([organizationId, recipeId])
@@ -297,6 +302,7 @@ model MenuItem {
   createdAt          DateTime       @default(now())
   updatedAt          DateTime       @updatedAt
   archivedAt         DateTime?
+  saleItems          SaleItem[]
 
   @@unique([organizationId, name])
   @@index([organizationId, status])
@@ -316,6 +322,124 @@ enum InventoryMovementType {
   ADJUSTMENT_OUT
   STOCK_COUNT_GAIN
   STOCK_COUNT_LOSS
+  SALE_CONSUMPTION
+  SALE_REVERSAL
+}
+
+enum SaleChannelFeeType {
+  NONE
+  PERCENT
+  FIXED
+}
+
+enum SaleChannelStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum SaleStatus {
+  POSTED
+  CANCELLED
+}
+
+/// Org-scoped sales channel (in-store, delivery, …) with fee configuration.
+model SaleChannel {
+  id             String             @id
+  organizationId String
+  organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  /// Stable code such as INSTORE or DELIVERY (unique per org).
+  code           String
+  name           String
+  feeType        SaleChannelFeeType @default(NONE)
+  /// Percent (0–100) or fixed currency amount depending on feeType.
+  feeValue       Decimal            @default(0) @db.Decimal(24, 6)
+  status         SaleChannelStatus  @default(ACTIVE)
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  sales          Sale[]
+
+  @@unique([organizationId, code])
+  @@index([organizationId, status])
+  @@map("sale_channel")
+}
+
+/// Posted sale. Saving creates the sale and deducts stock in one transaction.
+model Sale {
+  id                   String       @id
+  organizationId       String
+  organization         Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  channelId            String
+  channel              SaleChannel  @relation(fields: [channelId], references: [id], onDelete: Restrict)
+  status               SaleStatus   @default(POSTED)
+  soldAt               DateTime
+  /// Client-supplied key; duplicate posts return the existing sale (idempotent).
+  idempotencyKey       String
+  currency             String
+  notes                String?
+  grossRevenue         Decimal      @db.Decimal(24, 6)
+  discountAmount       Decimal      @default(0) @db.Decimal(24, 6)
+  packagingCost        Decimal      @default(0) @db.Decimal(24, 6)
+  channelFeeAmount     Decimal      @db.Decimal(24, 6)
+  foodCostTotal        Decimal      @db.Decimal(24, 6)
+  /// netRevenue − foodCost − packaging − channelFee (not net profit).
+  contributionMargin   Decimal      @db.Decimal(24, 6)
+  cancelledAt          DateTime?
+  cancelReason         String?
+  createdByUserId      String?
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+  items                SaleItem[]
+  consumptions         SaleStockConsumption[]
+
+  @@unique([organizationId, idempotencyKey])
+  @@index([organizationId, status, soldAt])
+  @@index([organizationId, channelId])
+  @@map("sale")
+}
+
+model SaleItem {
+  id                   String     @id
+  organizationId       String
+  saleId               String
+  sale                 Sale       @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  menuItemId           String
+  menuItem             MenuItem   @relation(fields: [menuItemId], references: [id], onDelete: Restrict)
+  menuItemNameSnapshot String
+  recipeId             String
+  recipe               Recipe     @relation(fields: [recipeId], references: [id], onDelete: Restrict)
+  recipeVersionId      String?
+  recipeVersion        RecipeVersion? @relation(fields: [recipeVersionId], references: [id], onDelete: Restrict)
+  quantity             Decimal    @db.Decimal(24, 6)
+  unitPriceSnapshot    Decimal    @db.Decimal(24, 6)
+  lineRevenue          Decimal    @db.Decimal(24, 6)
+  foodCostSnapshot     Decimal    @db.Decimal(24, 6)
+  createdAt            DateTime   @default(now())
+  consumptions         SaleStockConsumption[]
+
+  @@index([organizationId])
+  @@index([saleId])
+  @@index([menuItemId])
+  @@map("sale_item")
+}
+
+/// Ingredient qty consumed by a sale line (audit + reversal source).
+model SaleStockConsumption {
+  id                String   @id
+  organizationId    String
+  saleId            String
+  sale              Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  saleItemId        String
+  saleItem          SaleItem @relation(fields: [saleItemId], references: [id], onDelete: Cascade)
+  ingredientId      String
+  ingredient        Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Restrict)
+  quantityBase      Decimal  @db.Decimal(24, 6)
+  unitCostSnapshot  Decimal  @db.Decimal(24, 6)
+  totalCostSnapshot Decimal  @db.Decimal(24, 6)
+
+  @@index([organizationId, saleId])
+  @@index([saleItemId])
+  @@index([ingredientId])
+  @@map("sale_stock_consumption")
 }
 
 model Supplier {
