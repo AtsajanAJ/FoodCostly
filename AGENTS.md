@@ -215,7 +215,9 @@ Sprint 5: Recipes and Menu Costing is Done (2026-11-19).
 
 Sprint 6: Sales and Profitability is Done (2026-11-19).
 
-Current milestone: Sprint 7: Dashboard and Reports.
+Sprint 7: Dashboard and Reports is Done (2026-11-19).
 
-Do not start billing or external integrations before dashboard/report
-workflows are working and tested.
+Current milestone: Sprint 8: Hardening and Release.
+
+Do not start billing or external marketplace/POS integrations in
+hardening; focus on tests, security review, and release readiness.

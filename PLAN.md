@@ -290,6 +290,8 @@ Acceptance criteria - In-store and delivery sales can be recorded. - Saving a sa
 
 MVP fee assumption (reversible): percent/fixed channel fees apply to net revenue (gross − discount).
 Sprint 7 --- Dashboard and Reports
+<small>Status: Done (2026-11-19) — KPI dashboard with org-timezone date/channel filters, purchase/inventory/menu profitability reports, CSV export, Recharts contribution breakdown; margins labeled (contribution vs gross), never as net profit.</small>
+
 Deliverables - Dashboard KPIs. - Purchase reports. - Inventory and
 stock valuation reports. - Food cost and menu profitability reports. -
 Date and channel filters. - CSV export if time permits.
