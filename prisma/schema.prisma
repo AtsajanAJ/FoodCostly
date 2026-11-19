@@ -183,6 +183,11 @@ enum PurchaseStatus {
 
 enum InventoryMovementType {
   PURCHASE_RECEIPT
+  WASTE
+  ADJUSTMENT_IN
+  ADJUSTMENT_OUT
+  STOCK_COUNT_GAIN
+  STOCK_COUNT_LOSS
 }
 
 model Supplier {

@@ -209,8 +209,9 @@ Sprint 2: Ingredients and Units is Done (2026-11-19).
 
 Sprint 3: Suppliers and Purchases is Done (2026-11-19).
 
-Current milestone: Sprint 4: Inventory (balances, waste/adjustments,
-stock count, low-stock).
+Sprint 4: Inventory is Done (2026-11-19).
 
-Do not start sales, billing, or external integrations before inventory
-workflows beyond purchase-receive are working and tested.
+Current milestone: Sprint 5: Recipes and Menu Costing.
+
+Do not start sales, billing, or external integrations before recipe and
+menu costing are working and tested.

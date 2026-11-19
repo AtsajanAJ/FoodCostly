@@ -259,6 +259,8 @@ MVP allocation assumption (open decision #1, reversible): header
 discount is allocated by lineGross share; tax and shipping are allocated
 by share of (lineGross - discountShare).
 Sprint 4 --- Inventory
+<small>Status: Done (2026-11-19) — stock balances, ledger UI, waste/adjustment/stock-count compensating movements, low-stock indicator, negative-stock rejection tests.</small>
+
 Deliverables - Stock balance view. - Inventory ledger. - Waste and
 adjustment workflows. - Stock count workflow (basic). - Low-stock
 indicator.

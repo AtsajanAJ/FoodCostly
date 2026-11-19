@@ -48,6 +48,13 @@ export default async function DashboardPage() {
         >
           Purchases
         </Button>
+        <Button
+          variant="outline"
+          render={<Link href="/dashboard/inventory" />}
+          nativeButton={false}
+        >
+          Inventory
+        </Button>
       </div>
 
       <section className="space-y-2 rounded-lg border border-border p-4">
