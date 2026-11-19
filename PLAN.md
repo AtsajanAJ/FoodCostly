@@ -267,6 +267,8 @@ indicator.
 
 Acceptance criteria - Stock balance matches the sum of ledger movements. - Every movement has a reason and reference. - Corrections are compensating movements. - No user or workflow can make stock negative; insufficient stock operations are rejected atomically.
 Sprint 5 --- Recipes and Menu Costing
+<small>Status: Done (2026-11-19) — recipes/items, live MWAC costing, published version snapshots, menu channel prices, yield-at-recipe-item assumption.</small>
+
 Deliverables - Recipe CRUD and recipe items. - Menu item CRUD and
 pricing. - Recipe yield/portion support. - Cost calculation using
 MWAC. - Recipe cost history/versioning.
@@ -276,6 +278,9 @@ multiplied by their applicable unit costs. - Unit conversion and yield
 loss are handled correctly. - Updating current ingredient cost does not
 rewrite old recipe/sale snapshots. - Tests cover rounding and fractional
 quantities.
+
+MVP yield assumption (open decision #2, reversible): edible yield % is
+stored on each recipe item; required raw qty = baseQty / (yield%/100).
 Sprint 6 --- Sales and Profitability
 Deliverables - Channel setup. - Manual sale entry. - Sale items and sale-time snapshots. - Percentage/fixed channel fees. - Immediate inventory deduction on sale save. - Cancellation and refund/reversal flow.
 
@@ -324,6 +329,7 @@ corresponding feature is implemented:
 1. Purchase tax/discount/shipping cost allocation method.
    (Temporary MVP default in use: proportional by line value — see Sprint 3 note.)
 2. Whether ingredient preparation loss is represented at ingredient level or recipe level.
+   (Temporary MVP default in use: recipe-item yield percent — see Sprint 5 note.)
 3. Exact roles/permission matrix and invitation policy.
 4. Whether purchase documents need receipt image uploads in MVP.
 Confirmed decisions: one operating location per organization in MVP;

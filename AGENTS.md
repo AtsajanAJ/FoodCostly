@@ -211,7 +211,9 @@ Sprint 3: Suppliers and Purchases is Done (2026-11-19).
 
 Sprint 4: Inventory is Done (2026-11-19).
 
-Current milestone: Sprint 5: Recipes and Menu Costing.
+Sprint 5: Recipes and Menu Costing is Done (2026-11-19).
 
-Do not start sales, billing, or external integrations before recipe and
-menu costing are working and tested.
+Current milestone: Sprint 6: Sales and Profitability.
+
+Do not start billing or external integrations before sales workflows are
+working and tested.

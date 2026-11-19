@@ -55,6 +55,20 @@ export default async function DashboardPage() {
         >
           Inventory
         </Button>
+        <Button
+          variant="outline"
+          render={<Link href="/dashboard/recipes" />}
+          nativeButton={false}
+        >
+          Recipes
+        </Button>
+        <Button
+          variant="outline"
+          render={<Link href="/dashboard/menus" />}
+          nativeButton={false}
+        >
+          Menus
+        </Button>
       </div>
 
       <section className="space-y-2 rounded-lg border border-border p-4">

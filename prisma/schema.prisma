@@ -96,6 +96,8 @@ model Organization {
   purchases        Purchase[]
   stockBalances    StockBalance[]
   inventoryLedger  InventoryLedgerEntry[]
+  recipes          Recipe[]
+  menuItems        MenuItem[]
 
   @@unique([slug])
   @@map("organization")
@@ -125,6 +127,8 @@ model Unit {
   updatedAt    DateTime      @updatedAt
   ingredients   Ingredient[]
   purchaseLines PurchaseLine[]
+  recipeItems   RecipeItem[]
+  versionItems  RecipeVersionItem[]
 
   @@index([dimension])
   @@map("unit")
@@ -168,12 +172,136 @@ model Ingredient {
   purchaseLines      PurchaseLine[]
   stockBalance       StockBalance?
   ledgerEntries      InventoryLedgerEntry[]
+  recipeItems        RecipeItem[]
+  versionItems       RecipeVersionItem[]
 
   @@unique([organizationId, name])
   @@index([organizationId, status])
   @@index([organizationId, categoryId])
   @@index([baseUnitId])
   @@map("ingredient")
+}
+
+enum RecipeStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum MenuItemStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+model Recipe {
+  id             String          @id
+  organizationId String
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
+  description    String?
+  /// Number of portions this recipe yields.
+  portionCount   Decimal         @db.Decimal(24, 6)
+  status         RecipeStatus    @default(ACTIVE)
+  notes          String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  archivedAt     DateTime?
+  items          RecipeItem[]
+  versions       RecipeVersion[]
+  menuItems      MenuItem[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId, status])
+  @@map("recipe")
+}
+
+/// Current editable recipe lines. Costing uses live MWAC unless a version snapshot is used.
+model RecipeItem {
+  id             String   @id
+  organizationId String
+  recipeId       String
+  recipe         Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  ingredientId   String
+  ingredient     Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Restrict)
+  quantity       Decimal  @db.Decimal(24, 6)
+  unitId         String
+  unit           Unit     @relation(fields: [unitId], references: [id], onDelete: Restrict)
+  /// Edible yield percent (100 = no prep loss). Assumed at recipe-item level for MVP.
+  yieldPercent   Decimal  @default(100) @db.Decimal(8, 4)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([recipeId])
+  @@index([ingredientId])
+  @@map("recipe_item")
+}
+
+/// Immutable cost snapshot. Updating ingredient MWAC later must not rewrite these rows.
+model RecipeVersion {
+  id              String              @id
+  organizationId  String
+  recipeId        String
+  recipe          Recipe              @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  versionNumber   Int
+  portionCount    Decimal             @db.Decimal(24, 6)
+  totalCost       Decimal             @db.Decimal(24, 6)
+  costPerPortion  Decimal             @db.Decimal(24, 6)
+  notes           String?
+  createdByUserId String?
+  createdAt       DateTime            @default(now())
+  items           RecipeVersionItem[]
+  menuItems       MenuItem[]
+
+  @@unique([recipeId, versionNumber])
+  @@index([organizationId, recipeId])
+  @@map("recipe_version")
+}
+
+model RecipeVersionItem {
+  id                   String        @id
+  organizationId       String
+  recipeVersionId      String
+  recipeVersion        RecipeVersion @relation(fields: [recipeVersionId], references: [id], onDelete: Cascade)
+  ingredientId         String
+  ingredient           Ingredient    @relation(fields: [ingredientId], references: [id], onDelete: Restrict)
+  quantity             Decimal       @db.Decimal(24, 6)
+  unitId               String
+  unit                 Unit          @relation(fields: [unitId], references: [id], onDelete: Restrict)
+  baseQuantity         Decimal       @db.Decimal(24, 6)
+  yieldPercent         Decimal       @db.Decimal(8, 4)
+  /// Raw base qty required after yield loss (baseQuantity / yieldFraction).
+  requiredBaseQuantity Decimal       @db.Decimal(24, 6)
+  unitCostSnapshot     Decimal       @db.Decimal(24, 6)
+  lineCostSnapshot     Decimal       @db.Decimal(24, 6)
+
+  @@index([organizationId])
+  @@index([recipeVersionId])
+  @@index([ingredientId])
+  @@map("recipe_version_item")
+}
+
+model MenuItem {
+  id                 String         @id
+  organizationId     String
+  organization       Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name               String
+  description        String?
+  recipeId           String
+  recipe             Recipe         @relation(fields: [recipeId], references: [id], onDelete: Restrict)
+  /// Optional pinned snapshot; null means use latest published version for display.
+  recipeVersionId    String?
+  recipeVersion      RecipeVersion? @relation(fields: [recipeVersionId], references: [id], onDelete: SetNull)
+  priceInStore       Decimal?       @db.Decimal(24, 6)
+  priceDelivery      Decimal?       @db.Decimal(24, 6)
+  status             MenuItemStatus @default(ACTIVE)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  archivedAt         DateTime?
+
+  @@unique([organizationId, name])
+  @@index([organizationId, status])
+  @@index([recipeId])
+  @@map("menu_item")
 }
 
 enum PurchaseStatus {
