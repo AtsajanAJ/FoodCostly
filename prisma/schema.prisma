@@ -90,8 +90,12 @@ model Organization {
   locale      String?               @default("en")
   members     Member[]
   invitations Invitation[]
-  categories  IngredientCategory[]
-  ingredients Ingredient[]
+  categories       IngredientCategory[]
+  ingredients      Ingredient[]
+  suppliers        Supplier[]
+  purchases        Purchase[]
+  stockBalances    StockBalance[]
+  inventoryLedger  InventoryLedgerEntry[]
 
   @@unique([slug])
   @@map("organization")
@@ -119,7 +123,8 @@ model Unit {
   isBase       Boolean       @default(false)
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
-  ingredients  Ingredient[]
+  ingredients   Ingredient[]
+  purchaseLines PurchaseLine[]
 
   @@index([dimension])
   @@map("unit")
@@ -160,12 +165,137 @@ model Ingredient {
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
   archivedAt         DateTime?
+  purchaseLines      PurchaseLine[]
+  stockBalance       StockBalance?
+  ledgerEntries      InventoryLedgerEntry[]
 
   @@unique([organizationId, name])
   @@index([organizationId, status])
   @@index([organizationId, categoryId])
   @@index([baseUnitId])
   @@map("ingredient")
+}
+
+enum PurchaseStatus {
+  DRAFT
+  RECEIVED
+}
+
+enum InventoryMovementType {
+  PURCHASE_RECEIPT
+}
+
+model Supplier {
+  id             String       @id
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
+  contactName    String?
+  email          String?
+  phone          String?
+  notes          String?
+  archivedAt     DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  purchases      Purchase[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+  @@map("supplier")
+}
+
+model Purchase {
+  id               String         @id
+  organizationId   String
+  organization     Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  supplierId       String
+  supplier         Supplier       @relation(fields: [supplierId], references: [id], onDelete: Restrict)
+  purchasedAt      DateTime
+  invoiceNumber    String?
+  status           PurchaseStatus @default(DRAFT)
+  currency         String
+  discountAmount   Decimal        @default(0) @db.Decimal(24, 6)
+  taxAmount        Decimal        @default(0) @db.Decimal(24, 6)
+  shippingAmount   Decimal        @default(0) @db.Decimal(24, 6)
+  notes            String?
+  receivedAt       DateTime?
+  receivedByUserId String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  lines            PurchaseLine[]
+
+  @@index([organizationId, status])
+  @@index([organizationId, purchasedAt])
+  @@index([supplierId])
+  @@map("purchase")
+}
+
+model PurchaseLine {
+  id                 String       @id
+  organizationId     String
+  purchaseId         String
+  purchase           Purchase     @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+  ingredientId       String
+  ingredient         Ingredient   @relation(fields: [ingredientId], references: [id], onDelete: Restrict)
+  quantity           Decimal      @db.Decimal(24, 6)
+  unitId             String
+  unit               Unit         @relation(fields: [unitId], references: [id], onDelete: Restrict)
+  unitPrice          Decimal      @db.Decimal(24, 6)
+  baseQuantity       Decimal      @db.Decimal(24, 6)
+  lineGross          Decimal      @db.Decimal(24, 6)
+  allocatedDiscount  Decimal      @default(0) @db.Decimal(24, 6)
+  allocatedTax       Decimal      @default(0) @db.Decimal(24, 6)
+  allocatedShipping  Decimal      @default(0) @db.Decimal(24, 6)
+  allocatedCost      Decimal      @db.Decimal(24, 6)
+  /// Historical cost per base unit at receive time; null while draft.
+  baseUnitCost       Decimal?     @db.Decimal(24, 6)
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  @@index([organizationId])
+  @@index([purchaseId])
+  @@index([ingredientId])
+  @@map("purchase_line")
+}
+
+model StockBalance {
+  id             String       @id
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  ingredientId   String       @unique
+  ingredient     Ingredient   @relation(fields: [ingredientId], references: [id], onDelete: Restrict)
+  quantityBase   Decimal      @default(0) @db.Decimal(24, 6)
+  valueTotal     Decimal      @default(0) @db.Decimal(24, 6)
+  updatedAt      DateTime     @updatedAt
+
+  @@index([organizationId, ingredientId])
+  @@map("stock_balance")
+}
+
+model InventoryLedgerEntry {
+  id                    String                 @id
+  organizationId        String
+  organization          Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  ingredientId          String
+  ingredient            Ingredient             @relation(fields: [ingredientId], references: [id], onDelete: Restrict)
+  movementType          InventoryMovementType
+  quantityBase          Decimal                @db.Decimal(24, 6)
+  unitCost              Decimal                @db.Decimal(24, 6)
+  totalCost             Decimal                @db.Decimal(24, 6)
+  balanceQuantityAfter  Decimal                @db.Decimal(24, 6)
+  balanceValueAfter     Decimal                @db.Decimal(24, 6)
+  occurredAt            DateTime
+  reason                String?
+  referenceType         String
+  referenceId           String
+  lineReferenceId       String?
+  createdByUserId       String?
+  createdAt             DateTime               @default(now())
+
+  @@unique([organizationId, referenceType, referenceId, lineReferenceId, movementType])
+  @@index([organizationId, ingredientId, occurredAt])
+  @@index([organizationId, referenceType, referenceId])
+  @@map("inventory_ledger_entry")
 }
 
 model Member {

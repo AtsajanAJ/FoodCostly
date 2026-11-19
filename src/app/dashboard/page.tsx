@@ -27,12 +27,26 @@ export default async function DashboardPage() {
 
       <OrganizationSwitcher activeOrganizationId={tenant.organizationId} />
 
-      <div>
+      <div className="flex flex-wrap gap-2">
         <Button
           render={<Link href="/dashboard/ingredients" />}
           nativeButton={false}
         >
-          Manage ingredients
+          Ingredients
+        </Button>
+        <Button
+          variant="outline"
+          render={<Link href="/dashboard/suppliers" />}
+          nativeButton={false}
+        >
+          Suppliers
+        </Button>
+        <Button
+          variant="outline"
+          render={<Link href="/dashboard/purchases" />}
+          nativeButton={false}
+        >
+          Purchases
         </Button>
       </div>
 

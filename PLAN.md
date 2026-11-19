@@ -244,6 +244,8 @@ Acceptance criteria - An ingredient has exactly one base unit. -
 Valid conversions work (e.g. 1 kg = 1,000 g). - Invalid dimension
 conversions are rejected. - Decimal quantities and costs are preserved.
 Sprint 3 --- Suppliers and Purchases
+<small>Status: Done (2026-11-19) — suppliers, draft purchases, proportional header cost allocation (documented MVP assumption), atomic receive with ledger/MWAC, history/detail pages.</small>
+
 Deliverables - Supplier CRUD. - Purchase draft and line items. -
 Purchase totals. - Receive purchase workflow. - Purchase history and
 detail page.
@@ -252,6 +254,10 @@ Acceptance criteria - Purchase quantity converts to base quantity
 correctly. - Receiving a purchase creates stock ledger entries exactly
 once. - Purchase and stock updates are atomic. - Historical purchase
 price remains unchanged after later purchases.
+
+MVP allocation assumption (open decision #1, reversible): header
+discount is allocated by lineGross share; tax and shipping are allocated
+by share of (lineGross - discountShare).
 Sprint 4 --- Inventory
 Deliverables - Stock balance view. - Inventory ledger. - Waste and
 adjustment workflows. - Stock count workflow (basic). - Low-stock
@@ -314,6 +320,7 @@ logged. - Documentation is updated.
 The following decisions remain open and must be confirmed before the
 corresponding feature is implemented:
 1. Purchase tax/discount/shipping cost allocation method.
+   (Temporary MVP default in use: proportional by line value — see Sprint 3 note.)
 2. Whether ingredient preparation loss is represented at ingredient level or recipe level.
 3. Exact roles/permission matrix and invitation policy.
 4. Whether purchase documents need receipt image uploads in MVP.

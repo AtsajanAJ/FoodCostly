@@ -207,7 +207,10 @@ Sprint 1: Authentication and Tenant Isolation is Done (2026-11-19).
 
 Sprint 2: Ingredients and Units is Done (2026-11-19).
 
-Current milestone: Sprint 3: Suppliers and Purchases.
+Sprint 3: Suppliers and Purchases is Done (2026-11-19).
 
-Do not start inventory ledger posting, sales, billing, or external
-integrations before purchases/receiving are working and tested.
+Current milestone: Sprint 4: Inventory (balances, waste/adjustments,
+stock count, low-stock).
+
+Do not start sales, billing, or external integrations before inventory
+workflows beyond purchase-receive are working and tested.
