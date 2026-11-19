@@ -40,6 +40,13 @@ Copy `.env.example` to `.env` and fill in Neon connection strings before running
 | Prisma generate | `bunx prisma generate` |
 | Prisma migrate | `bunx prisma migrate dev` |
 
+## CI note
+
+GitHub Actions auto-CI is **deferred** (account billing lock). The workflow
+file remains at `.github/workflows/ci.yml` but only supports manual
+`workflow_dispatch` until billing is fixed. Until then, run lint,
+typecheck, test, and build locally before merging.
+
 ## Stack
 
 Next.js App Router · TypeScript · Tailwind CSS · shadcn/ui · Neon PostgreSQL · Prisma ORM v7 · Bun · Vercel

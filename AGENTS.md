@@ -194,9 +194,16 @@ reveals a material defect; explain the impact and request approval.
 For low-risk UI choices, use a consistent, accessible default and
 document it.
 12. Current Project Stage
-Sprint 0: Project Foundation is now in progress. The confirmed product decisions above must be treated as requirements.
+Sprint 0: Project Foundation is Done (2026-11-19). Confirmed product
+decisions above remain requirements.
 
-Current milestone: Sprint 0: Project Foundation (shell, folders, CI in place; finish env/CI verification then close). Next: Sprint 1: Authentication and Tenant Isolation.
+Note: GitHub Actions automatic CI is deferred because the GitHub account
+is locked due to a billing issue. The workflow exists but runs only via
+manual `workflow_dispatch` until billing is fixed. Until then, run
+`bun run lint`, `bun run typecheck`, `bun run test`, and `bun run build`
+locally before merging. Those four commands passed when Sprint 0 closed.
+
+Current milestone: Sprint 1: Authentication and Tenant Isolation.
 
 Do not start advanced inventory, costing, sales, billing, or external
 integrations before the foundation and tenant boundary are working and

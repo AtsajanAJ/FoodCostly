@@ -209,17 +209,18 @@ prematurely.
 The schedule is an estimate for one developer and should be adjusted
 after the first technical spike.
 Sprint 0 --- Product and Technical Foundation
-<small>Status: In progress — Bun/Prisma/Neon/shadcn ready; app shell + folder layout + CI added; env validation present; close out after CI green on main.</small>
+<small>Status: Done (2026-11-19) — foundation complete locally. GitHub Actions auto-CI deferred: account billing lock blocked runners. Workflow kept as manual `workflow_dispatch` only; re-enable push/PR triggers after billing is fixed. Local checks passed: lint, typecheck, test, build.</small>
 
 Deliverables - Repository and project conventions. - Next.js,
 TypeScript strict mode, Tailwind, shadcn/ui. - Neon development
 database. - Prisma v7 configuration and first migration. - Environment
 variable validation. - Basic application shell and error handling. - CI
-checks: lint, typecheck, tests, build.
+workflow file present (auto-run deferred; see status note).
 
 Acceptance criteria - App runs locally using documented commands. -
 Database connection and migration work. - Secrets are not committed. -
-CI catches lint/type/build failures.
+Local lint/type/test/build pass. Remote CI green deferred until GitHub
+billing is resolved.
 Sprint 1 --- Authentication and Tenant Isolation
 Deliverables - Better Auth setup. - Organization creation and
 switching. - Organization membership and role checks. - Protected

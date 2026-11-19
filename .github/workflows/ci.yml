@@ -1,10 +1,24 @@
+# DEFERRED: GitHub Actions auto-runs are paused because the GitHub
+# account hit a billing lock ("job was not started because your account
+# is locked due to a billing issue").
+#
+# Local verification completed (2026-11-19):
+#   bun run lint
+#   bun run typecheck
+#   bun run test
+#   bun run build
+#
+# Re-enable automatic CI after billing is resolved by restoring:
+#   on:
+#     push:
+#       branches: [main, develop]
+#     pull_request:
+#       branches: [main, develop]
+# and removing the workflow_dispatch-only trigger below.
 name: CI
 
 on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main, develop]
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
