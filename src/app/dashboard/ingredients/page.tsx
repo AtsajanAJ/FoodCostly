@@ -2,19 +2,19 @@ import Link from "next/link";
 import { CreateCategoryForm } from "@/features/ingredients/create-category-form";
 import { CreateIngredientForm } from "@/features/ingredients/create-ingredient-form";
 import { IngredientList } from "@/features/ingredients/ingredient-list";
+import { getDictionary } from "@/i18n/get-dictionary";
+import { getLocale } from "@/i18n/get-locale";
 import { requireTenantContext } from "@/server/permissions/tenant-context";
 import * as categoryService from "@/server/services/category-service";
 import * as ingredientService from "@/server/services/ingredient-service";
 import * as unitRepository from "@/server/repositories/unit-repository";
 
-export const metadata = {
-  title: "Ingredients",
-};
-
 export const instant = false;
 
 export default async function IngredientsPage() {
   const tenant = await requireTenantContext();
+  const locale = await getLocale();
+  const dict = await getDictionary(locale);
   const [units, categories, ingredients] = await Promise.all([
     unitRepository.listUnits(),
     categoryService.listIngredientCategories(tenant),
@@ -31,19 +31,20 @@ export default async function IngredientsPage() {
         <div className="space-y-1">
           <p className="text-sm text-muted-foreground">
             <Link href="/dashboard" className="underline underline-offset-4">
-              Dashboard
+              {dict.common.dashboard}
             </Link>
           </p>
-          <h1 className="text-2xl font-semibold tracking-tight">Ingredients</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {dict.ingredients.title}
+          </h1>
           <p className="text-sm text-muted-foreground">
-            {tenant.organizationName} · each ingredient has exactly one base
-            unit (g, ml, or pcs)
+            {tenant.organizationName} · {dict.ingredients.subtitle}
           </p>
         </div>
       </div>
 
       <section className="space-y-3">
-        <h2 className="text-sm font-medium">Categories</h2>
+        <h2 className="text-sm font-medium">{dict.ingredients.categories}</h2>
         <CreateCategoryForm />
         {categories.length > 0 ? (
           <ul className="flex flex-wrap gap-2 text-sm">
@@ -57,7 +58,9 @@ export default async function IngredientsPage() {
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-muted-foreground">No categories yet.</p>
+          <p className="text-sm text-muted-foreground">
+            {dict.ingredients.noCategories}
+          </p>
         )}
       </section>
 
@@ -74,7 +77,7 @@ export default async function IngredientsPage() {
       />
 
       <section className="space-y-3">
-        <h2 className="text-sm font-medium">Ingredient list</h2>
+        <h2 className="text-sm font-medium">{dict.ingredients.ingredientList}</h2>
         <IngredientList
           ingredients={ingredients.map((ingredient) => ({
             id: ingredient.id,
@@ -94,7 +97,7 @@ export default async function IngredientsPage() {
       </section>
 
       <section className="space-y-2 rounded-lg border border-border p-4">
-        <h2 className="text-sm font-medium">Available units</h2>
+        <h2 className="text-sm font-medium">{dict.ingredients.availableUnits}</h2>
         <ul className="grid gap-1 text-sm text-muted-foreground sm:grid-cols-2">
           {units.map((unit) => (
             <li key={unit.id}>

@@ -6,9 +6,11 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useDictionary } from "@/features/i18n/i18n-provider";
 import { authClient } from "@/lib/auth-client";
 
 export function SignUpForm() {
+  const dict = useDictionary();
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -30,7 +32,7 @@ export function SignUpForm() {
     setPending(false);
 
     if (result.error) {
-      setError(result.error.message ?? "Unable to create account");
+      setError(result.error.message ?? dict.auth.signUpError);
       return;
     }
 
@@ -41,7 +43,7 @@ export function SignUpForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="name">Name</Label>
+        <Label htmlFor="name">{dict.common.name}</Label>
         <Input
           id="name"
           autoComplete="name"
@@ -51,7 +53,7 @@ export function SignUpForm() {
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">{dict.common.email}</Label>
         <Input
           id="email"
           type="email"
@@ -62,7 +64,7 @@ export function SignUpForm() {
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password">{dict.common.password}</Label>
         <Input
           id="password"
           type="password"
@@ -75,12 +77,12 @@ export function SignUpForm() {
       </div>
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
       <Button type="submit" className="w-full" disabled={pending}>
-        {pending ? "Creating account…" : "Create account"}
+        {pending ? dict.auth.creatingAccount : dict.auth.createAccount}
       </Button>
       <p className="text-sm text-muted-foreground">
-        Already have an account?{" "}
+        {dict.auth.haveAccount}{" "}
         <Link href="/sign-in" className="underline underline-offset-4">
-          Sign in
+          {dict.auth.signInLink}
         </Link>
       </p>
     </form>

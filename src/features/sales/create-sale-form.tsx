@@ -6,6 +6,8 @@ import { createSaleAction } from "@/features/sales/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useDictionary } from "@/features/i18n/i18n-provider";
+import { channelLabel } from "@/i18n/channel-label";
 
 type ChannelOption = { id: string; name: string; code: string };
 type MenuOption = {
@@ -22,6 +24,7 @@ export function CreateSaleForm({
   channels: ChannelOption[];
   menuItems: MenuOption[];
 }) {
+  const dict = useDictionary();
   const router = useRouter();
   const [channelId, setChannelId] = useState(channels[0]?.id ?? "");
   const [menuItemId, setMenuItemId] = useState(menuItems[0]?.id ?? "");
@@ -60,7 +63,7 @@ export function CreateSaleForm({
     <form onSubmit={onSubmit} className="space-y-4">
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1">
-          <Label htmlFor="channel">Channel</Label>
+          <Label htmlFor="channel">{dict.common.channel}</Label>
           <select
             id="channel"
             className="h-9 w-full rounded-lg border border-border bg-background px-3 text-sm"
@@ -70,13 +73,13 @@ export function CreateSaleForm({
           >
             {channels.map((channel) => (
               <option key={channel.id} value={channel.id}>
-                {channel.name}
+                {channelLabel(dict, channel.code, channel.name)}
               </option>
             ))}
           </select>
         </div>
         <div className="space-y-1">
-          <Label htmlFor="menu-item">Menu item</Label>
+          <Label htmlFor="menu-item">{dict.sales.menuItem}</Label>
           <select
             id="menu-item"
             className="h-9 w-full rounded-lg border border-border bg-background px-3 text-sm"
@@ -92,14 +95,14 @@ export function CreateSaleForm({
               return (
                 <option key={item.id} value={item.id}>
                   {item.name}
-                  {price ? ` · ${price}` : " · no price"}
+                  {price ? ` · ${price}` : ` · ${dict.sales.noPrice}`}
                 </option>
               );
             })}
           </select>
         </div>
         <div className="space-y-1">
-          <Label htmlFor="qty">Quantity</Label>
+          <Label htmlFor="qty">{dict.common.quantity}</Label>
           <Input
             id="qty"
             inputMode="decimal"
@@ -109,7 +112,7 @@ export function CreateSaleForm({
           />
         </div>
         <div className="space-y-1">
-          <Label htmlFor="discount">Discount</Label>
+          <Label htmlFor="discount">{dict.sales.discount}</Label>
           <Input
             id="discount"
             inputMode="decimal"
@@ -118,7 +121,7 @@ export function CreateSaleForm({
           />
         </div>
         <div className="space-y-1">
-          <Label htmlFor="packaging">Packaging cost</Label>
+          <Label htmlFor="packaging">{dict.sales.packaging}</Label>
           <Input
             id="packaging"
             inputMode="decimal"
@@ -127,16 +130,13 @@ export function CreateSaleForm({
           />
         </div>
       </div>
-      <p className="text-sm text-muted-foreground">
-        Saving posts the sale and deducts recipe stock immediately. Insufficient
-        stock rejects the whole sale.
-      </p>
+      <p className="text-sm text-muted-foreground">{dict.sales.deductNote}</p>
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
       <Button
         type="submit"
         disabled={pending || channels.length === 0 || menuItems.length === 0}
       >
-        {pending ? "Posting…" : "Post sale"}
+        {pending ? dict.sales.posting : dict.sales.postSale}
       </Button>
     </form>
   );

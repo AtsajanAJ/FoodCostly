@@ -2,10 +2,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Decimal } from "decimal.js";
 import { ReceivePurchaseButton } from "@/features/purchases/receive-purchase-button";
+import { getDictionary } from "@/i18n/get-dictionary";
+import { getLocale } from "@/i18n/get-locale";
 import { requireTenantContext } from "@/server/permissions/tenant-context";
 import * as purchaseService from "@/server/services/purchase-service";
 
-export const metadata = { title: "Purchase detail" };
 export const instant = false;
 
 export default async function PurchaseDetailPage({
@@ -15,6 +16,8 @@ export default async function PurchaseDetailPage({
 }) {
   const { purchaseId } = await params;
   const tenant = await requireTenantContext();
+  const locale = await getLocale();
+  const dict = await getDictionary(locale);
   const purchase = await purchaseService.getPurchaseForTenant(
     tenant,
     purchaseId,
@@ -37,11 +40,11 @@ export default async function PurchaseDetailPage({
             href="/dashboard/purchases"
             className="underline underline-offset-4"
           >
-            Purchases
+            {dict.purchases.title}
           </Link>
         </p>
         <h1 className="text-2xl font-semibold tracking-tight">
-          Purchase {purchase.purchasedAt.toISOString().slice(0, 10)}
+          {dict.purchases.detail} {purchase.purchasedAt.toISOString().slice(0, 10)}
         </h1>
         <p className="text-sm text-muted-foreground">
           {purchase.supplier.name} · {purchase.status} · {purchase.currency}
@@ -50,11 +53,13 @@ export default async function PurchaseDetailPage({
 
       <dl className="grid gap-3 text-sm sm:grid-cols-2">
         <div>
-          <dt className="text-muted-foreground">Invoice</dt>
+          <dt className="text-muted-foreground">{dict.common.invoice}</dt>
           <dd className="font-medium">{purchase.invoiceNumber ?? "—"}</dd>
         </div>
         <div>
-          <dt className="text-muted-foreground">Discount / Tax / Shipping</dt>
+          <dt className="text-muted-foreground">
+            {dict.purchases.discountTaxShipping}
+          </dt>
           <dd className="font-medium">
             {purchase.discountAmount.toString()} /{" "}
             {purchase.taxAmount.toString()} /{" "}
@@ -62,15 +67,17 @@ export default async function PurchaseDetailPage({
           </dd>
         </div>
         <div>
-          <dt className="text-muted-foreground">Allocated lines total</dt>
+          <dt className="text-muted-foreground">{dict.purchases.allocatedTotal}</dt>
           <dd className="font-medium">{linesTotal.toFixed(6)}</dd>
         </div>
         <div>
-          <dt className="text-muted-foreground">Received at</dt>
+          <dt className="text-muted-foreground">
+            {dict.purchases.receivedAtLabel}
+          </dt>
           <dd className="font-medium">
             {purchase.receivedAt
               ? purchase.receivedAt.toISOString()
-              : "Not received"}
+              : dict.purchases.notReceived}
           </dd>
         </div>
       </dl>
@@ -79,7 +86,7 @@ export default async function PurchaseDetailPage({
         <ReceivePurchaseButton purchaseId={purchase.id} />
       ) : (
         <p className="text-sm text-muted-foreground">
-          Received purchases are immutable. Historical line costs stay fixed.
+          {dict.purchases.immutableNote}
         </p>
       )}
 
@@ -87,13 +94,17 @@ export default async function PurchaseDetailPage({
         <table className="min-w-full text-left text-sm">
           <thead className="border-b border-border bg-muted/40">
             <tr>
-              <th className="px-3 py-2 font-medium">Ingredient</th>
-              <th className="px-3 py-2 font-medium">Qty</th>
-              <th className="px-3 py-2 font-medium">Unit</th>
-              <th className="px-3 py-2 font-medium">Unit price</th>
-              <th className="px-3 py-2 font-medium">Base qty</th>
-              <th className="px-3 py-2 font-medium">Allocated cost</th>
-              <th className="px-3 py-2 font-medium">Base unit cost</th>
+              <th className="px-3 py-2 font-medium">{dict.common.ingredient}</th>
+              <th className="px-3 py-2 font-medium">{dict.common.qty}</th>
+              <th className="px-3 py-2 font-medium">{dict.common.unit}</th>
+              <th className="px-3 py-2 font-medium">{dict.purchases.unitPrice}</th>
+              <th className="px-3 py-2 font-medium">{dict.purchases.baseQty}</th>
+              <th className="px-3 py-2 font-medium">
+                {dict.purchases.allocatedCost}
+              </th>
+              <th className="px-3 py-2 font-medium">
+                {dict.purchases.baseUnitCost}
+              </th>
             </tr>
           </thead>
           <tbody>

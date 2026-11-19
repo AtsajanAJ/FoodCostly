@@ -1,17 +1,16 @@
-import Link from "next/link";
 import { Suspense } from "react";
 import { SignOutButton } from "@/features/auth/sign-out-button";
+import { DashboardNav } from "@/features/dashboard/dashboard-nav";
 import { OrganizationSwitcher } from "@/features/organizations/organization-switcher";
 import { ContributionChart } from "@/features/reports/contribution-chart";
 import { ReportFilters } from "@/features/reports/report-filters";
-import { Button } from "@/components/ui/button";
+import { channelLabel } from "@/i18n/channel-label";
+import { formatMessage } from "@/i18n/format";
+import { getDictionary } from "@/i18n/get-dictionary";
+import { getLocale } from "@/i18n/get-locale";
 import { requireTenantContext } from "@/server/permissions/tenant-context";
 import * as reportService from "@/server/services/report-service";
 import * as saleService from "@/server/services/sale-service";
-
-export const metadata = {
-  title: "Dashboard",
-};
 
 export const instant = false;
 
@@ -21,6 +20,8 @@ export default async function DashboardPage({
   searchParams: Promise<{ from?: string; to?: string; channelId?: string }>;
 }) {
   const tenant = await requireTenantContext();
+  const locale = await getLocale();
+  const dict = await getDictionary(locale);
   const params = await searchParams;
   const [kpis, channels] = await Promise.all([
     reportService.getDashboardKpis(tenant, {
@@ -32,11 +33,11 @@ export default async function DashboardPage({
   ]);
 
   const chartData = [
-    { label: "Net revenue", value: Number(kpis.netRevenue.toString()) },
-    { label: "Food cost", value: Number(kpis.foodCostTotal.toString()) },
-    { label: "Fees", value: Number(kpis.channelFeeAmount.toString()) },
+    { label: dict.dashboard.netRevenue, value: Number(kpis.netRevenue.toString()) },
+    { label: dict.dashboard.foodCost, value: Number(kpis.foodCostTotal.toString()) },
+    { label: dict.dashboard.fees, value: Number(kpis.channelFeeAmount.toString()) },
     {
-      label: "Contribution",
+      label: dict.dashboard.contribution,
       value: Number(kpis.contributionMargin.toString()),
     },
   ];
@@ -45,9 +46,11 @@ export default async function DashboardPage({
     <div className="space-y-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {dict.dashboard.title}
+          </h1>
           <p className="text-sm text-muted-foreground">
-            {tenant.organizationName} · {kpis.currency} · timezone{" "}
+            {tenant.organizationName} · {kpis.currency} · {dict.dashboard.timezone}{" "}
             {kpis.timeZone}
           </p>
         </div>
@@ -56,63 +59,7 @@ export default async function DashboardPage({
 
       <OrganizationSwitcher activeOrganizationId={tenant.organizationId} />
 
-      <div className="flex flex-wrap gap-2">
-        <Button
-          render={<Link href="/dashboard/ingredients" />}
-          nativeButton={false}
-        >
-          Ingredients
-        </Button>
-        <Button
-          variant="outline"
-          render={<Link href="/dashboard/suppliers" />}
-          nativeButton={false}
-        >
-          Suppliers
-        </Button>
-        <Button
-          variant="outline"
-          render={<Link href="/dashboard/purchases" />}
-          nativeButton={false}
-        >
-          Purchases
-        </Button>
-        <Button
-          variant="outline"
-          render={<Link href="/dashboard/inventory" />}
-          nativeButton={false}
-        >
-          Inventory
-        </Button>
-        <Button
-          variant="outline"
-          render={<Link href="/dashboard/recipes" />}
-          nativeButton={false}
-        >
-          Recipes
-        </Button>
-        <Button
-          variant="outline"
-          render={<Link href="/dashboard/menus" />}
-          nativeButton={false}
-        >
-          Menus
-        </Button>
-        <Button
-          variant="outline"
-          render={<Link href="/dashboard/sales" />}
-          nativeButton={false}
-        >
-          Sales
-        </Button>
-        <Button
-          variant="outline"
-          render={<Link href="/dashboard/reports" />}
-          nativeButton={false}
-        >
-          Reports
-        </Button>
-      </div>
+      <DashboardNav dict={dict} />
 
       <Suspense fallback={null}>
         <ReportFilters
@@ -121,40 +68,45 @@ export default async function DashboardPage({
           channelId={params.channelId}
           channels={channels.map((channel) => ({
             id: channel.id,
-            name: channel.name,
+            name: channelLabel(dict, channel.code, channel.name),
           }))}
         />
       </Suspense>
 
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Kpi
-          label="Net revenue"
+          label={dict.dashboard.netRevenue}
           value={kpis.netRevenue.toString()}
-          hint={`${kpis.saleCount} posted sales`}
+          hint={formatMessage(dict.dashboard.postedSales, {
+            count: kpis.saleCount,
+          })}
         />
         <Kpi
-          label="Food cost %"
+          label={dict.dashboard.foodCostPercent}
           value={`${kpis.foodCostPercent.toString()}%`}
-          hint={`Food cost ${kpis.foodCostTotal.toString()}`}
+          hint={`${dict.dashboard.foodCost} ${kpis.foodCostTotal.toString()}`}
         />
         <Kpi
-          label="Contribution margin"
+          label={dict.dashboard.contributionMargin}
           value={kpis.contributionMargin.toString()}
-          hint="Not net profit — opex excluded"
+          hint={dict.dashboard.contributionHint}
         />
         <Kpi
-          label="Inventory value"
+          label={dict.dashboard.inventoryValue}
           value={kpis.inventoryValue.toString()}
-          hint={`Purchases in range ${kpis.purchaseSpend.toString()}`}
+          hint={formatMessage(dict.dashboard.purchasesInRange, {
+            amount: kpis.purchaseSpend.toString(),
+          })}
         />
       </section>
 
       <section className="space-y-3 rounded-lg border border-border p-4">
-        <h2 className="text-sm font-medium">Contribution breakdown</h2>
+        <h2 className="text-sm font-medium">
+          {dict.dashboard.contributionBreakdown}
+        </h2>
         <ContributionChart data={chartData} />
         <p className="text-sm text-muted-foreground">
-          Contribution margin = net revenue − food cost − packaging − channel
-          fees. This is not net profit.
+          {dict.dashboard.contributionExplain}
         </p>
       </section>
     </div>

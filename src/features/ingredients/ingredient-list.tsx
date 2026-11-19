@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { archiveIngredientAction } from "@/features/ingredients/actions";
+import { useDictionary } from "@/features/i18n/i18n-provider";
 import { Button } from "@/components/ui/button";
 
 type IngredientRow = {
@@ -14,6 +15,7 @@ type IngredientRow = {
 };
 
 export function IngredientList({ ingredients }: { ingredients: IngredientRow[] }) {
+  const dict = useDictionary();
   const [error, setError] = useState<string | null>(null);
   const [pendingId, setPendingId] = useState<string | null>(null);
 
@@ -29,9 +31,7 @@ export function IngredientList({ ingredients }: { ingredients: IngredientRow[] }
 
   if (ingredients.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground">
-        No ingredients yet. Create one to start costing recipes later.
-      </p>
+      <p className="text-sm text-muted-foreground">{dict.ingredients.emptyHint}</p>
     );
   }
 
@@ -42,11 +42,11 @@ export function IngredientList({ ingredients }: { ingredients: IngredientRow[] }
         <table className="min-w-full text-left text-sm">
           <thead className="border-b border-border bg-muted/40">
             <tr>
-              <th className="px-3 py-2 font-medium">Name</th>
-              <th className="px-3 py-2 font-medium">Base unit</th>
-              <th className="px-3 py-2 font-medium">Category</th>
-              <th className="px-3 py-2 font-medium">Min stock</th>
-              <th className="px-3 py-2 font-medium">Status</th>
+              <th className="px-3 py-2 font-medium">{dict.common.name}</th>
+              <th className="px-3 py-2 font-medium">{dict.ingredients.baseUnit}</th>
+              <th className="px-3 py-2 font-medium">{dict.ingredients.category}</th>
+              <th className="px-3 py-2 font-medium">{dict.ingredients.minStock}</th>
+              <th className="px-3 py-2 font-medium">{dict.common.status}</th>
               <th className="px-3 py-2 font-medium" />
             </tr>
           </thead>
@@ -71,7 +71,7 @@ export function IngredientList({ ingredients }: { ingredients: IngredientRow[] }
                       disabled={pendingId === ingredient.id}
                       onClick={() => void onArchive(ingredient.id)}
                     >
-                      Archive
+                      {dict.ingredients.archive}
                     </Button>
                   ) : null}
                 </td>

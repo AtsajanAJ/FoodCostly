@@ -6,6 +6,7 @@ import {
   recordStockCountAction,
   recordWasteAction,
 } from "@/features/inventory/actions";
+import { useDictionary } from "@/features/i18n/i18n-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,6 +27,7 @@ export function WasteForm({
   ingredients: Option[];
   units: Option[];
 }) {
+  const dict = useDictionary();
   const state = useFormState();
   const [ingredientId, setIngredientId] = useState(ingredients[0]?.id ?? "");
   const [unitId, setUnitId] = useState(
@@ -50,14 +52,14 @@ export function WasteForm({
       state.setError(result.error);
       return;
     }
-    state.setSuccess("Waste recorded");
+    state.setSuccess(dict.inventory.wasteRecorded);
     setQuantity("");
     setReason("");
   }
 
   return (
     <form onSubmit={onSubmit} className="space-y-3 rounded-lg border border-border p-4">
-      <h2 className="text-sm font-medium">Record waste</h2>
+      <h2 className="text-sm font-medium">{dict.inventory.waste}</h2>
       <InventoryFields
         ingredients={ingredients}
         units={units}
@@ -69,11 +71,11 @@ export function WasteForm({
         setQuantity={setQuantity}
         reason={reason}
         setReason={setReason}
-        quantityLabel="Quantity"
+        quantityLabel={dict.common.quantity}
       />
       <StatusMessages {...state} />
       <Button type="submit" disabled={state.pending || ingredients.length === 0}>
-        {state.pending ? "Saving…" : "Record waste"}
+        {state.pending ? dict.common.saving : dict.inventory.waste}
       </Button>
     </form>
   );
@@ -86,6 +88,7 @@ export function AdjustmentForm({
   ingredients: Option[];
   units: Option[];
 }) {
+  const dict = useDictionary();
   const state = useFormState();
   const [ingredientId, setIngredientId] = useState(ingredients[0]?.id ?? "");
   const [unitId, setUnitId] = useState(
@@ -114,7 +117,7 @@ export function AdjustmentForm({
       state.setError(result.error);
       return;
     }
-    state.setSuccess("Adjustment recorded");
+    state.setSuccess(dict.inventory.adjustmentRecorded);
     setQuantity("");
     setReason("");
     setUnitCost("");
@@ -122,9 +125,9 @@ export function AdjustmentForm({
 
   return (
     <form onSubmit={onSubmit} className="space-y-3 rounded-lg border border-border p-4">
-      <h2 className="text-sm font-medium">Stock adjustment</h2>
+      <h2 className="text-sm font-medium">{dict.inventory.stockAdjustment}</h2>
       <div className="space-y-1">
-        <Label htmlFor="direction">Direction</Label>
+        <Label htmlFor="direction">{dict.inventory.direction}</Label>
         <select
           id="direction"
           className="h-9 w-full rounded-lg border border-border bg-background px-3 text-sm"
@@ -133,8 +136,8 @@ export function AdjustmentForm({
             setDirection(event.target.value as "IN" | "OUT")
           }
         >
-          <option value="OUT">Decrease</option>
-          <option value="IN">Increase</option>
+          <option value="OUT">{dict.inventory.decrease}</option>
+          <option value="IN">{dict.inventory.increase}</option>
         </select>
       </div>
       <InventoryFields
@@ -148,23 +151,23 @@ export function AdjustmentForm({
         setQuantity={setQuantity}
         reason={reason}
         setReason={setReason}
-        quantityLabel="Quantity"
+        quantityLabel={dict.common.quantity}
       />
       {direction === "IN" ? (
         <div className="space-y-1">
-          <Label htmlFor="unit-cost">Unit cost (optional, base unit)</Label>
+          <Label htmlFor="unit-cost">{dict.inventory.unitCostOptional}</Label>
           <Input
             id="unit-cost"
             inputMode="decimal"
             value={unitCost}
             onChange={(event) => setUnitCost(event.target.value)}
-            placeholder="defaults to current MWAC"
+            placeholder={dict.inventory.mwacDefault}
           />
         </div>
       ) : null}
       <StatusMessages {...state} />
       <Button type="submit" disabled={state.pending || ingredients.length === 0}>
-        {state.pending ? "Saving…" : "Record adjustment"}
+        {state.pending ? dict.common.saving : dict.inventory.recordAdjustment}
       </Button>
     </form>
   );
@@ -177,13 +180,16 @@ export function StockCountForm({
   ingredients: Option[];
   units: Option[];
 }) {
+  const dict = useDictionary();
   const state = useFormState();
   const [ingredientId, setIngredientId] = useState(ingredients[0]?.id ?? "");
   const [unitId, setUnitId] = useState(
     units.find((unit) => unit.code === "g")?.id ?? units[0]?.id ?? "",
   );
   const [countedQuantity, setCountedQuantity] = useState("");
-  const [reason, setReason] = useState("Stock count");
+  const [reason, setReason] = useState<string>(
+    dict.inventory.stockCountReasonDefault,
+  );
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -201,13 +207,13 @@ export function StockCountForm({
       state.setError(result.error);
       return;
     }
-    state.setSuccess("Stock count applied");
+    state.setSuccess(dict.inventory.stockCountApplied);
     setCountedQuantity("");
   }
 
   return (
     <form onSubmit={onSubmit} className="space-y-3 rounded-lg border border-border p-4">
-      <h2 className="text-sm font-medium">Stock count</h2>
+      <h2 className="text-sm font-medium">{dict.inventory.stockCount}</h2>
       <InventoryFields
         ingredients={ingredients}
         units={units}
@@ -219,11 +225,11 @@ export function StockCountForm({
         setQuantity={setCountedQuantity}
         reason={reason}
         setReason={setReason}
-        quantityLabel="Counted quantity"
+        quantityLabel={dict.inventory.countedQuantity}
       />
       <StatusMessages {...state} />
       <Button type="submit" disabled={state.pending || ingredients.length === 0}>
-        {state.pending ? "Saving…" : "Apply count"}
+        {state.pending ? dict.common.saving : dict.inventory.applyCount}
       </Button>
     </form>
   );
@@ -254,10 +260,12 @@ function InventoryFields({
   setReason: (value: string) => void;
   quantityLabel: string;
 }) {
+  const dict = useDictionary();
+
   return (
     <>
       <div className="space-y-1">
-        <Label>Ingredient</Label>
+        <Label>{dict.common.ingredient}</Label>
         <select
           className="h-9 w-full rounded-lg border border-border bg-background px-3 text-sm"
           value={ingredientId}
@@ -282,7 +290,7 @@ function InventoryFields({
           />
         </div>
         <div className="space-y-1">
-          <Label>Unit</Label>
+          <Label>{dict.common.unit}</Label>
           <select
             className="h-9 w-full rounded-lg border border-border bg-background px-3 text-sm"
             value={unitId}
@@ -298,7 +306,7 @@ function InventoryFields({
         </div>
       </div>
       <div className="space-y-1">
-        <Label>Reason</Label>
+        <Label>{dict.inventory.reason}</Label>
         <Input
           value={reason}
           onChange={(event) => setReason(event.target.value)}

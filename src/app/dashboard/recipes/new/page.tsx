@@ -1,14 +1,17 @@
 import Link from "next/link";
 import { CreateRecipeForm } from "@/features/recipes/create-recipe-form";
+import { getDictionary } from "@/i18n/get-dictionary";
+import { getLocale } from "@/i18n/get-locale";
 import { requireTenantContext } from "@/server/permissions/tenant-context";
 import * as ingredientService from "@/server/services/ingredient-service";
 import * as unitRepository from "@/server/repositories/unit-repository";
 
-export const metadata = { title: "New recipe" };
 export const instant = false;
 
 export default async function NewRecipePage() {
   const tenant = await requireTenantContext();
+  const locale = await getLocale();
+  const dict = await getDictionary(locale);
   const [ingredients, units] = await Promise.all([
     ingredientService.listIngredientsForTenant(tenant),
     unitRepository.listUnits(),
@@ -19,19 +22,15 @@ export default async function NewRecipePage() {
       <div className="space-y-1">
         <p className="text-sm text-muted-foreground">
           <Link href="/dashboard/recipes" className="underline underline-offset-4">
-            Recipes
+            {dict.recipes.title}
           </Link>
         </p>
-        <h1 className="text-2xl font-semibold tracking-tight">New recipe</h1>
-        <p className="text-sm text-muted-foreground">
-          Yield % is edible yield at recipe-item level (MVP assumption).
-        </p>
+        <h1 className="text-2xl font-semibold tracking-tight">{dict.recipes.new}</h1>
+        <p className="text-sm text-muted-foreground">{dict.recipes.yieldNote}</p>
       </div>
 
       {ingredients.length === 0 ? (
-        <p className="text-sm text-muted-foreground">
-          Add ingredients before creating a recipe.
-        </p>
+        <p className="text-sm text-muted-foreground">{dict.recipes.needIngredients}</p>
       ) : (
         <CreateRecipeForm
           ingredients={ingredients.map((ingredient) => ({

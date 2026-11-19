@@ -2,10 +2,12 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { DownloadCsvButton } from "@/features/reports/download-csv-button";
 import { ReportFilters } from "@/features/reports/report-filters";
+import { formatMessage } from "@/i18n/format";
+import { getDictionary } from "@/i18n/get-dictionary";
+import { getLocale } from "@/i18n/get-locale";
 import { requireTenantContext } from "@/server/permissions/tenant-context";
 import * as reportService from "@/server/services/report-service";
 
-export const metadata = { title: "Purchase report" };
 export const instant = false;
 
 export default async function PurchaseReportPage({
@@ -14,6 +16,8 @@ export default async function PurchaseReportPage({
   searchParams: Promise<{ from?: string; to?: string }>;
 }) {
   const tenant = await requireTenantContext();
+  const locale = await getLocale();
+  const dict = await getDictionary(locale);
   const params = await searchParams;
   const report = await reportService.getPurchaseReport(tenant, {
     fromDate: params.from,
@@ -25,14 +29,17 @@ export default async function PurchaseReportPage({
       <div className="space-y-1">
         <p className="text-sm text-muted-foreground">
           <Link href="/dashboard/reports" className="underline underline-offset-4">
-            Reports
+            {dict.reports.title}
           </Link>
         </p>
         <h1 className="text-2xl font-semibold tracking-tight">
-          Purchase report
+          {dict.reports.purchaseReport}
         </h1>
         <p className="text-sm text-muted-foreground">
-          Received purchases · {report.currency} · {report.timeZone}
+          {formatMessage(dict.reports.receivedPurchasesMeta, {
+            currency: report.currency,
+            timeZone: report.timeZone,
+          })}
         </p>
       </div>
 
@@ -46,12 +53,17 @@ export default async function PurchaseReportPage({
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm">
-          Total spend:{" "}
+          {dict.reports.totalSpend}:{" "}
           <span className="font-semibold">{report.totalSpend.toString()}</span>
         </p>
         <DownloadCsvButton
           filename={`purchases-${report.fromDate}-${report.toDate}.csv`}
-          headers={["Received at", "Supplier", "Lines", "Total cost"]}
+          headers={[
+            dict.reports.csvReceivedAt,
+            dict.purchases.supplier,
+            dict.common.lines,
+            dict.reports.csvTotalCost,
+          ]}
           rows={report.rows.map((row) => [
             row.receivedAt.toISOString(),
             row.supplierName,
@@ -62,16 +74,18 @@ export default async function PurchaseReportPage({
       </div>
 
       {report.rows.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No purchases in range.</p>
+        <p className="text-sm text-muted-foreground">
+          {dict.reports.noPurchasesInRange}
+        </p>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-border">
           <table className="min-w-full text-left text-sm">
             <thead className="border-b border-border bg-muted/40">
               <tr>
-                <th className="px-3 py-2 font-medium">Received</th>
-                <th className="px-3 py-2 font-medium">Supplier</th>
-                <th className="px-3 py-2 font-medium">Lines</th>
-                <th className="px-3 py-2 font-medium">Total cost</th>
+                <th className="px-3 py-2 font-medium">{dict.common.received}</th>
+                <th className="px-3 py-2 font-medium">{dict.purchases.supplier}</th>
+                <th className="px-3 py-2 font-medium">{dict.common.lines}</th>
+                <th className="px-3 py-2 font-medium">{dict.common.totalCost}</th>
               </tr>
             </thead>
             <tbody>

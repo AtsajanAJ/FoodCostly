@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createRecipeAction } from "@/features/recipes/actions";
+import { useDictionary } from "@/features/i18n/i18n-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,6 +23,7 @@ export function CreateRecipeForm({
   ingredients: Option[];
   units: Option[];
 }) {
+  const dict = useDictionary();
   const router = useRouter();
   const defaultUnitId = useMemo(
     () => units.find((unit) => unit.code === "g")?.id ?? units[0]?.id ?? "",
@@ -64,7 +66,7 @@ export function CreateRecipeForm({
     <form onSubmit={onSubmit} className="space-y-4">
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1">
-          <Label htmlFor="recipe-name">Name</Label>
+          <Label htmlFor="recipe-name">{dict.common.name}</Label>
           <Input
             id="recipe-name"
             value={name}
@@ -73,7 +75,7 @@ export function CreateRecipeForm({
           />
         </div>
         <div className="space-y-1">
-          <Label htmlFor="portions">Portions</Label>
+          <Label htmlFor="portions">{dict.recipes.portions}</Label>
           <Input
             id="portions"
             inputMode="decimal"
@@ -84,7 +86,7 @@ export function CreateRecipeForm({
         </div>
       </div>
       <div className="space-y-1">
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="description">{dict.common.description}</Label>
         <Input
           id="description"
           value={description}
@@ -94,7 +96,7 @@ export function CreateRecipeForm({
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-medium">Ingredients</h2>
+          <h2 className="text-sm font-medium">{dict.recipes.ingredientsHeading}</h2>
           <Button
             type="button"
             variant="outline"
@@ -111,7 +113,7 @@ export function CreateRecipeForm({
               ])
             }
           >
-            Add line
+            {dict.recipes.addLine}
           </Button>
         </div>
         {lines.map((line, index) => (
@@ -151,7 +153,7 @@ export function CreateRecipeForm({
                   ),
                 )
               }
-              placeholder="Qty"
+              placeholder={dict.common.qty}
               required
             />
             <select
@@ -186,7 +188,7 @@ export function CreateRecipeForm({
                   ),
                 )
               }
-              placeholder="Yield %"
+              placeholder={dict.recipes.yieldPercent}
               required
             />
           </div>
@@ -198,7 +200,7 @@ export function CreateRecipeForm({
         type="submit"
         disabled={pending || ingredients.length === 0}
       >
-        {pending ? "Saving…" : "Create recipe"}
+        {pending ? dict.common.saving : dict.recipes.create}
       </Button>
     </form>
   );

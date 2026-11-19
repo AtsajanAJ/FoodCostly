@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createMenuItemAction } from "@/features/recipes/actions";
+import { useDictionary } from "@/features/i18n/i18n-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +10,7 @@ import { Label } from "@/components/ui/label";
 type RecipeOption = { id: string; name: string; hasVersion: boolean };
 
 export function CreateMenuItemForm({ recipes }: { recipes: RecipeOption[] }) {
+  const dict = useDictionary();
   const [name, setName] = useState("");
   const [recipeId, setRecipeId] = useState(recipes[0]?.id ?? "");
   const [priceInStore, setPriceInStore] = useState("");
@@ -35,7 +37,7 @@ export function CreateMenuItemForm({ recipes }: { recipes: RecipeOption[] }) {
       setError(result.error);
       return;
     }
-    setSuccess("Menu item created");
+    setSuccess(dict.menus.created);
     setName("");
     setPriceInStore("");
     setPriceDelivery("");
@@ -43,10 +45,10 @@ export function CreateMenuItemForm({ recipes }: { recipes: RecipeOption[] }) {
 
   return (
     <form onSubmit={onSubmit} className="space-y-3 rounded-lg border border-border p-4">
-      <h2 className="text-sm font-medium">Add menu item</h2>
+      <h2 className="text-sm font-medium">{dict.menus.add}</h2>
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1">
-          <Label htmlFor="menu-name">Name</Label>
+          <Label htmlFor="menu-name">{dict.common.name}</Label>
           <Input
             id="menu-name"
             value={name}
@@ -55,7 +57,7 @@ export function CreateMenuItemForm({ recipes }: { recipes: RecipeOption[] }) {
           />
         </div>
         <div className="space-y-1">
-          <Label htmlFor="recipe">Recipe</Label>
+          <Label htmlFor="recipe">{dict.menus.recipe}</Label>
           <select
             id="recipe"
             className="h-9 w-full rounded-lg border border-border bg-background px-3 text-sm"
@@ -66,13 +68,13 @@ export function CreateMenuItemForm({ recipes }: { recipes: RecipeOption[] }) {
             {recipes.map((recipe) => (
               <option key={recipe.id} value={recipe.id}>
                 {recipe.name}
-                {recipe.hasVersion ? "" : " (no published version)"}
+                {recipe.hasVersion ? "" : ` ${dict.menus.noVersion}`}
               </option>
             ))}
           </select>
         </div>
         <div className="space-y-1">
-          <Label htmlFor="price-in-store">In-store price</Label>
+          <Label htmlFor="price-in-store">{dict.menus.priceInStore}</Label>
           <Input
             id="price-in-store"
             inputMode="decimal"
@@ -81,7 +83,7 @@ export function CreateMenuItemForm({ recipes }: { recipes: RecipeOption[] }) {
           />
         </div>
         <div className="space-y-1">
-          <Label htmlFor="price-delivery">Delivery price</Label>
+          <Label htmlFor="price-delivery">{dict.menus.priceDelivery}</Label>
           <Input
             id="price-delivery"
             inputMode="decimal"
@@ -96,12 +98,12 @@ export function CreateMenuItemForm({ recipes }: { recipes: RecipeOption[] }) {
           checked={pinLatestVersion}
           onChange={(event) => setPinLatestVersion(event.target.checked)}
         />
-        Pin latest published recipe version (recommended)
+        {dict.menus.pinVersion}
       </label>
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
       {success ? <p className="text-sm text-muted-foreground">{success}</p> : null}
       <Button type="submit" disabled={pending || recipes.length === 0}>
-        {pending ? "Saving…" : "Create menu item"}
+        {pending ? dict.common.saving : dict.menus.createMenuItem}
       </Button>
     </form>
   );

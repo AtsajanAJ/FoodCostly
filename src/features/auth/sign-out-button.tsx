@@ -3,9 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useDictionary } from "@/features/i18n/i18n-provider";
 import { authClient } from "@/lib/auth-client";
 
 export function SignOutButton() {
+  const dict = useDictionary();
   const router = useRouter();
   const [pending, setPending] = useState(false);
 
@@ -25,7 +27,7 @@ export function SignOutButton() {
       disabled={pending}
       onClick={() => void onSignOut()}
     >
-      {pending ? "Signing out…" : "Sign out"}
+      {pending ? dict.auth.signingOut : dict.auth.signOut}
     </Button>
   );
 }

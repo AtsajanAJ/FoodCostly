@@ -6,9 +6,11 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useDictionary } from "@/features/i18n/i18n-provider";
 import { authClient } from "@/lib/auth-client";
 
 export function SignInForm() {
+  const dict = useDictionary();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,7 +30,7 @@ export function SignInForm() {
     setPending(false);
 
     if (result.error) {
-      setError(result.error.message ?? "Unable to sign in");
+      setError(result.error.message ?? dict.auth.signInError);
       return;
     }
 
@@ -39,7 +41,7 @@ export function SignInForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">{dict.common.email}</Label>
         <Input
           id="email"
           type="email"
@@ -50,7 +52,7 @@ export function SignInForm() {
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password">{dict.common.password}</Label>
         <Input
           id="password"
           type="password"
@@ -63,12 +65,12 @@ export function SignInForm() {
       </div>
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
       <Button type="submit" className="w-full" disabled={pending}>
-        {pending ? "Signing in…" : "Sign in"}
+        {pending ? dict.auth.signingIn : dict.auth.signInAction}
       </Button>
       <p className="text-sm text-muted-foreground">
-        No account yet?{" "}
+        {dict.auth.noAccount}{" "}
         <Link href="/sign-up" className="underline underline-offset-4">
-          Create one
+          {dict.auth.createOne}
         </Link>
       </p>
     </form>

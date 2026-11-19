@@ -40,6 +40,11 @@ FoodCostly helps one restaurant location track purchases, stock, recipe cost, sa
 3. Figures show **contribution margin**, not net profit (operating expenses are out of scope).
 4. Export CSV from report pages when available.
 
+## Language
+
+Use the language switcher in the top header to choose **English** or **ไทย**.
+The choice is saved in a browser cookie and applies across public and signed-in pages.
+
 ## Demo
 
 Visit `/demo` to explore sample UI without saving data.

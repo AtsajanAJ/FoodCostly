@@ -4,6 +4,8 @@ import { useState } from "react";
 import { updateChannelFeeAction } from "@/features/sales/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useDictionary } from "@/features/i18n/i18n-provider";
+import { formatMessage } from "@/i18n/format";
 
 type Channel = {
   id: string;
@@ -13,6 +15,7 @@ type Channel = {
 };
 
 export function ChannelFeeForm({ channels }: { channels: Channel[] }) {
+  const dict = useDictionary();
   const [rows, setRows] = useState(channels);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -32,12 +35,12 @@ export function ChannelFeeForm({ channels }: { channels: Channel[] }) {
       setError(result.error);
       return;
     }
-    setSuccess(`Updated ${channel.name}`);
+    setSuccess(formatMessage(dict.sales.updated, { name: channel.name }));
   }
 
   return (
     <div className="space-y-3">
-      <h2 className="text-sm font-medium">Channel fees</h2>
+      <h2 className="text-sm font-medium">{dict.sales.channelFees}</h2>
       {rows.map((channel) => (
         <div
           key={channel.id}
@@ -60,9 +63,9 @@ export function ChannelFeeForm({ channels }: { channels: Channel[] }) {
               )
             }
           >
-            <option value="NONE">None</option>
-            <option value="PERCENT">Percent</option>
-            <option value="FIXED">Fixed</option>
+            <option value="NONE">{dict.common.none}</option>
+            <option value="PERCENT">{dict.common.percent}</option>
+            <option value="FIXED">{dict.common.fixed}</option>
           </select>
           <Input
             inputMode="decimal"
@@ -83,7 +86,7 @@ export function ChannelFeeForm({ channels }: { channels: Channel[] }) {
             disabled={pendingId === channel.id}
             onClick={() => void save(channel)}
           >
-            {pendingId === channel.id ? "Saving…" : "Save"}
+            {pendingId === channel.id ? dict.common.saving : dict.common.save}
           </Button>
         </div>
       ))}

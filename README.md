@@ -40,6 +40,11 @@ Copy `.env.example` to `.env` and fill in Neon connection strings before running
 | Prisma generate | `bunx prisma generate` |
 | Prisma migrate | `bunx prisma migrate dev` |
 
+## Languages
+
+UI supports **English** and **Thai** via the header language switcher.
+Copy lives in `src/i18n/dictionaries/` (`en.ts`, `th.ts`). Preference is stored in the `fc_locale` cookie.
+
 ## Docs
 
 | Doc | Purpose |

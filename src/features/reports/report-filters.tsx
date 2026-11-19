@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useDictionary } from "@/features/i18n/i18n-provider";
 
 type ChannelOption = { id: string; name: string };
 
@@ -21,6 +22,7 @@ export function ReportFilters({
   channels?: ChannelOption[];
   showChannel?: boolean;
 }) {
+  const dict = useDictionary();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -51,7 +53,7 @@ export function ReportFilters({
       }}
     >
       <div className="space-y-1">
-        <Label htmlFor="from">From</Label>
+        <Label htmlFor="from">{dict.common.from}</Label>
         <Input
           id="from"
           type="date"
@@ -60,7 +62,7 @@ export function ReportFilters({
         />
       </div>
       <div className="space-y-1">
-        <Label htmlFor="to">To</Label>
+        <Label htmlFor="to">{dict.common.to}</Label>
         <Input
           id="to"
           type="date"
@@ -70,14 +72,14 @@ export function ReportFilters({
       </div>
       {showChannel && channels ? (
         <div className="space-y-1">
-          <Label htmlFor="channel">Channel</Label>
+          <Label htmlFor="channel">{dict.common.channel}</Label>
           <select
             id="channel"
             className="h-9 rounded-lg border border-border bg-background px-3 text-sm"
             value={channel}
             onChange={(event) => setChannel(event.target.value)}
           >
-            <option value="">All channels</option>
+            <option value="">{dict.common.allChannels}</option>
             {channels.map((item) => (
               <option key={item.id} value={item.id}>
                 {item.name}
@@ -87,7 +89,7 @@ export function ReportFilters({
         </div>
       ) : null}
       <Button type="submit" disabled={pending}>
-        {pending ? "Updating…" : "Apply"}
+        {pending ? dict.common.updating : dict.common.apply}
       </Button>
     </form>
   );

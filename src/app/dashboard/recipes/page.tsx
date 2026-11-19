@@ -1,13 +1,16 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { getDictionary } from "@/i18n/get-dictionary";
+import { getLocale } from "@/i18n/get-locale";
 import { requireTenantContext } from "@/server/permissions/tenant-context";
 import * as recipeService from "@/server/services/recipe-service";
 
-export const metadata = { title: "Recipes" };
 export const instant = false;
 
 export default async function RecipesPage() {
   const tenant = await requireTenantContext();
+  const locale = await getLocale();
+  const dict = await getDictionary(locale);
   const recipes = await recipeService.listRecipesForTenant(tenant);
 
   return (
@@ -16,10 +19,12 @@ export default async function RecipesPage() {
         <div className="space-y-1">
           <p className="text-sm text-muted-foreground">
             <Link href="/dashboard" className="underline underline-offset-4">
-              Dashboard
+              {dict.common.dashboard}
             </Link>
           </p>
-          <h1 className="text-2xl font-semibold tracking-tight">Recipes</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {dict.recipes.title}
+          </h1>
           <p className="text-sm text-muted-foreground">
             {tenant.organizationName}
           </p>
@@ -28,21 +33,23 @@ export default async function RecipesPage() {
           render={<Link href="/dashboard/recipes/new" />}
           nativeButton={false}
         >
-          New recipe
+          {dict.recipes.new}
         </Button>
       </div>
 
       {recipes.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No recipes yet.</p>
+        <p className="text-sm text-muted-foreground">{dict.recipes.empty}</p>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-border">
           <table className="min-w-full text-left text-sm">
             <thead className="border-b border-border bg-muted/40">
               <tr>
-                <th className="px-3 py-2 font-medium">Name</th>
-                <th className="px-3 py-2 font-medium">Portions</th>
-                <th className="px-3 py-2 font-medium">Items</th>
-                <th className="px-3 py-2 font-medium">Latest version</th>
+                <th className="px-3 py-2 font-medium">{dict.common.name}</th>
+                <th className="px-3 py-2 font-medium">{dict.recipes.portions}</th>
+                <th className="px-3 py-2 font-medium">{dict.recipes.items}</th>
+                <th className="px-3 py-2 font-medium">
+                  {dict.recipes.latestVersion}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -65,8 +72,8 @@ export default async function RecipesPage() {
                   <td className="px-3 py-2">{recipe.items.length}</td>
                   <td className="px-3 py-2">
                     {recipe.versions[0]
-                      ? `v${recipe.versions[0].versionNumber} · ${recipe.versions[0].costPerPortion.toString()}/portion`
-                      : "None"}
+                      ? `v${recipe.versions[0].versionNumber} · ${recipe.versions[0].costPerPortion.toString()}${dict.recipes.perPortion}`
+                      : dict.recipes.none}
                   </td>
                 </tr>
               ))}

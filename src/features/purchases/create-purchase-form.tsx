@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createPurchaseAction } from "@/features/purchases/actions";
+import { useDictionary } from "@/features/i18n/i18n-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,6 +26,7 @@ export function CreatePurchaseForm({
   ingredients: Option[];
   units: Option[];
 }) {
+  const dict = useDictionary();
   const router = useRouter();
   const defaultUnitId = useMemo(
     () => units.find((unit) => unit.code === "kg")?.id ?? units[0]?.id ?? "",
@@ -90,7 +92,7 @@ export function CreatePurchaseForm({
     <form onSubmit={onSubmit} className="space-y-4">
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1">
-          <Label htmlFor="supplier">Supplier</Label>
+          <Label htmlFor="supplier">{dict.purchases.supplier}</Label>
           <select
             id="supplier"
             className="h-9 w-full rounded-lg border border-border bg-background px-3 text-sm"
@@ -106,7 +108,7 @@ export function CreatePurchaseForm({
           </select>
         </div>
         <div className="space-y-1">
-          <Label htmlFor="purchased-at">Purchase date</Label>
+          <Label htmlFor="purchased-at">{dict.purchases.purchasedAt}</Label>
           <Input
             id="purchased-at"
             type="date"
@@ -116,7 +118,7 @@ export function CreatePurchaseForm({
           />
         </div>
         <div className="space-y-1">
-          <Label htmlFor="invoice">Invoice / reference</Label>
+          <Label htmlFor="invoice">{dict.purchases.invoiceRef}</Label>
           <Input
             id="invoice"
             value={invoiceNumber}
@@ -124,7 +126,7 @@ export function CreatePurchaseForm({
           />
         </div>
         <div className="space-y-1">
-          <Label htmlFor="notes">Notes</Label>
+          <Label htmlFor="notes">{dict.common.notes}</Label>
           <Input
             id="notes"
             value={notes}
@@ -135,7 +137,7 @@ export function CreatePurchaseForm({
 
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="space-y-1">
-          <Label htmlFor="discount">Discount</Label>
+          <Label htmlFor="discount">{dict.purchases.discount}</Label>
           <Input
             id="discount"
             inputMode="decimal"
@@ -144,7 +146,7 @@ export function CreatePurchaseForm({
           />
         </div>
         <div className="space-y-1">
-          <Label htmlFor="tax">Tax</Label>
+          <Label htmlFor="tax">{dict.purchases.tax}</Label>
           <Input
             id="tax"
             inputMode="decimal"
@@ -153,7 +155,7 @@ export function CreatePurchaseForm({
           />
         </div>
         <div className="space-y-1">
-          <Label htmlFor="shipping">Shipping</Label>
+          <Label htmlFor="shipping">{dict.purchases.shipping}</Label>
           <Input
             id="shipping"
             inputMode="decimal"
@@ -165,7 +167,7 @@ export function CreatePurchaseForm({
 
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-2">
-          <h2 className="text-sm font-medium">Lines</h2>
+          <h2 className="text-sm font-medium">{dict.common.lines}</h2>
           <Button
             type="button"
             variant="outline"
@@ -182,7 +184,7 @@ export function CreatePurchaseForm({
               ])
             }
           >
-            Add line
+            {dict.purchases.addLine}
           </Button>
         </div>
 
@@ -211,7 +213,7 @@ export function CreatePurchaseForm({
               onChange={(event) =>
                 updateLine(index, { quantity: event.target.value })
               }
-              placeholder="Qty"
+              placeholder={dict.common.qty}
               required
             />
             <select
@@ -234,7 +236,7 @@ export function CreatePurchaseForm({
               onChange={(event) =>
                 updateLine(index, { unitPrice: event.target.value })
               }
-              placeholder="Unit price"
+              placeholder={dict.purchases.unitPrice}
               required
             />
           </div>
@@ -246,7 +248,7 @@ export function CreatePurchaseForm({
         type="submit"
         disabled={pending || suppliers.length === 0 || ingredients.length === 0}
       >
-        {pending ? "Saving…" : "Save draft purchase"}
+        {pending ? dict.common.saving : dict.purchases.saveDraft}
       </Button>
     </form>
   );

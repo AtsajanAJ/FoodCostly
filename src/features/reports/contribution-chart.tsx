@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import {
   Bar,
   BarChart,
@@ -13,12 +13,16 @@ import {
 
 type Point = { label: string; value: number };
 
-export function ContributionChart({ data }: { data: Point[] }) {
-  const [mounted, setMounted] = useState(false);
+function subscribe() {
+  return () => undefined;
+}
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+function useIsClient() {
+  return useSyncExternalStore(subscribe, () => true, () => false);
+}
+
+export function ContributionChart({ data }: { data: Point[] }) {
+  const mounted = useIsClient();
 
   // Recharts ResponsiveContainer needs a real layout box; skip SSR.
   if (!mounted) {

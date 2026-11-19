@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useDictionary } from "@/features/i18n/i18n-provider";
 import { authClient } from "@/lib/auth-client";
 
 type OrganizationItem = {
@@ -17,6 +18,7 @@ export function OrganizationSwitcher({
 }: {
   activeOrganizationId: string;
 }) {
+  const dict = useDictionary();
   const router = useRouter();
   const [organizations, setOrganizations] = useState<OrganizationItem[]>([]);
   const [pending, setPending] = useState(false);
@@ -30,7 +32,7 @@ export function OrganizationSwitcher({
       if (cancelled) return;
 
       if (result.error) {
-        setError(result.error.message ?? "Unable to load organizations");
+        setError(result.error.message ?? dict.org.loadError);
         return;
       }
 
@@ -48,7 +50,7 @@ export function OrganizationSwitcher({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [dict.org.loadError]);
 
   async function onChange(organizationId: string) {
     if (organizationId === activeOrganizationId) return;
@@ -63,7 +65,7 @@ export function OrganizationSwitcher({
     setPending(false);
 
     if (result.error) {
-      setError(result.error.message ?? "Unable to switch organization");
+      setError(result.error.message ?? dict.org.switchError);
       return;
     }
 
@@ -77,7 +79,7 @@ export function OrganizationSwitcher({
   return (
     <div className="space-y-2">
       <label className="text-sm font-medium" htmlFor="org-switcher">
-        Active organization
+        {dict.org.active}
       </label>
       <div className="flex flex-wrap items-center gap-2">
         <select
@@ -99,7 +101,7 @@ export function OrganizationSwitcher({
           render={<Link href="/onboarding" />}
           nativeButton={false}
         >
-          New organization
+          {dict.org.new}
         </Button>
       </div>
       {error ? <p className="text-sm text-destructive">{error}</p> : null}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createIngredientAction } from "@/features/ingredients/actions";
+import { useDictionary } from "@/features/i18n/i18n-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,6 +16,7 @@ export function CreateIngredientForm({
   units: Option[];
   categories: Option[];
 }) {
+  const dict = useDictionary();
   const [name, setName] = useState("");
   const [baseUnitId, setBaseUnitId] = useState(units[0]?.id ?? "");
   const [categoryId, setCategoryId] = useState("");
@@ -51,10 +53,10 @@ export function CreateIngredientForm({
 
   return (
     <form onSubmit={onSubmit} className="space-y-3 rounded-lg border border-border p-4">
-      <h2 className="text-sm font-medium">Add ingredient</h2>
+      <h2 className="text-sm font-medium">{dict.ingredients.addIngredient}</h2>
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1">
-          <Label htmlFor="ingredient-name">Name</Label>
+          <Label htmlFor="ingredient-name">{dict.common.name}</Label>
           <Input
             id="ingredient-name"
             value={name}
@@ -63,7 +65,7 @@ export function CreateIngredientForm({
           />
         </div>
         <div className="space-y-1">
-          <Label htmlFor="base-unit">Base unit</Label>
+          <Label htmlFor="base-unit">{dict.ingredients.baseUnit}</Label>
           <select
             id="base-unit"
             className="h-9 w-full rounded-lg border border-border bg-background px-3 text-sm"
@@ -79,14 +81,14 @@ export function CreateIngredientForm({
           </select>
         </div>
         <div className="space-y-1">
-          <Label htmlFor="category">Category</Label>
+          <Label htmlFor="category">{dict.ingredients.category}</Label>
           <select
             id="category"
             className="h-9 w-full rounded-lg border border-border bg-background px-3 text-sm"
             value={categoryId}
             onChange={(event) => setCategoryId(event.target.value)}
           >
-            <option value="">No category</option>
+            <option value="">{dict.ingredients.noCategory}</option>
             {categories.map((category) => (
               <option key={category.id} value={category.id}>
                 {category.name}
@@ -95,28 +97,30 @@ export function CreateIngredientForm({
           </select>
         </div>
         <div className="space-y-1">
-          <Label htmlFor="minimum-stock">Minimum stock (base unit)</Label>
+          <Label htmlFor="minimum-stock">
+            {dict.ingredients.minimumStock} ({dict.ingredients.baseUnit})
+          </Label>
           <Input
             id="minimum-stock"
             inputMode="decimal"
             value={minimumStock}
             onChange={(event) => setMinimumStock(event.target.value)}
-            placeholder="optional"
+            placeholder={dict.common.optional}
           />
         </div>
       </div>
       <div className="space-y-1">
-        <Label htmlFor="notes">Notes</Label>
+        <Label htmlFor="notes">{dict.common.notes}</Label>
         <Input
           id="notes"
           value={notes}
           onChange={(event) => setNotes(event.target.value)}
-          placeholder="optional"
+          placeholder={dict.common.optional}
         />
       </div>
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
       <Button type="submit" disabled={pending || !baseUnitId}>
-        {pending ? "Saving…" : "Create ingredient"}
+        {pending ? dict.common.saving : dict.ingredients.createIngredient}
       </Button>
     </form>
   );
