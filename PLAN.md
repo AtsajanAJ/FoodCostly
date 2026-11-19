@@ -222,7 +222,7 @@ Database connection and migration work. - Secrets are not committed. -
 Local lint/type/test/build pass. Remote CI green deferred until GitHub
 billing is resolved.
 Sprint 1 --- Authentication and Tenant Isolation
-<small>Status: In progress — Better Auth + Organizations, tenant context, dashboard shell, and cross-tenant access tests underway.</small>
+<small>Status: Done (2026-11-19) — Better Auth + Organizations, tenant context, protected dashboard, cross-tenant tests, and public /demo trial path.</small>
 
 Deliverables - Better Auth setup. - Organization creation and
 switching. - Organization membership and role checks. - Protected
@@ -234,6 +234,8 @@ another organization's records by changing request IDs. - Tests cover
 cross-tenant read and write attempts. - All tenant-scoped queries use a
 centralized authorization pattern.
 Sprint 2 --- Ingredients and Units
+<small>Status: Done (2026-11-19) — system units seeded, categories/ingredients CRUD + archive, conversion service + tenant isolation tests.</small>
+
 Deliverables - Units and unit dimensions. - Ingredient categories. -
 Ingredient CRUD and archive. - Base-unit configuration. - Unit
 conversion service.

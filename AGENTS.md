@@ -203,9 +203,11 @@ manual `workflow_dispatch` until billing is fixed. Until then, run
 `bun run lint`, `bun run typecheck`, `bun run test`, and `bun run build`
 locally before merging. Those four commands passed when Sprint 0 closed.
 
-Current milestone: Sprint 1: Authentication and Tenant Isolation
-(Better Auth, organizations, tenant context, protected dashboard).
+Sprint 1: Authentication and Tenant Isolation is Done (2026-11-19).
 
-Do not start advanced inventory, costing, sales, billing, or external
-integrations before the foundation and tenant boundary are working and
-tested.
+Sprint 2: Ingredients and Units is Done (2026-11-19).
+
+Current milestone: Sprint 3: Suppliers and Purchases.
+
+Do not start inventory ledger posting, sales, billing, or external
+integrations before purchases/receiving are working and tested.

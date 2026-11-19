@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { SignOutButton } from "@/features/auth/sign-out-button";
 import { OrganizationSwitcher } from "@/features/organizations/organization-switcher";
+import { Button } from "@/components/ui/button";
 import { requireTenantContext } from "@/server/permissions/tenant-context";
 
 export const metadata = {
@@ -24,6 +26,15 @@ export default async function DashboardPage() {
       </div>
 
       <OrganizationSwitcher activeOrganizationId={tenant.organizationId} />
+
+      <div>
+        <Button
+          render={<Link href="/dashboard/ingredients" />}
+          nativeButton={false}
+        >
+          Manage ingredients
+        </Button>
+      </div>
 
       <section className="space-y-2 rounded-lg border border-border p-4">
         <h2 className="text-sm font-medium">Active tenant</h2>

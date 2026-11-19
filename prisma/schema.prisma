@@ -79,20 +79,93 @@ model Verification {
 }
 
 model Organization {
-  id          String       @id
+  id          String                @id
   name        String
   slug        String
   logo        String?
   createdAt   DateTime
   metadata    String?
-  currency    String?      @default("THB")
-  timezone    String?      @default("Asia/Bangkok")
-  locale      String?      @default("en")
+  currency    String?               @default("THB")
+  timezone    String?               @default("Asia/Bangkok")
+  locale      String?               @default("en")
   members     Member[]
   invitations Invitation[]
+  categories  IngredientCategory[]
+  ingredients Ingredient[]
 
   @@unique([slug])
   @@map("organization")
+}
+
+enum UnitDimension {
+  WEIGHT
+  VOLUME
+  COUNT
+}
+
+enum IngredientStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+/// System unit catalog (not tenant-owned). Canonical bases: g, ml, pcs.
+model Unit {
+  id           String        @id
+  code         String        @unique
+  name         String
+  dimension    UnitDimension
+  /// Multiply quantity in this unit by toBaseFactor to get canonical base quantity.
+  toBaseFactor Decimal       @db.Decimal(24, 12)
+  isBase       Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  ingredients  Ingredient[]
+
+  @@index([dimension])
+  @@map("unit")
+}
+
+model IngredientCategory {
+  id             String       @id
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
+  archivedAt     DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  ingredients    Ingredient[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+  @@map("ingredient_category")
+}
+
+model Ingredient {
+  id                 String             @id
+  organizationId     String
+  organization       Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  categoryId         String?
+  category           IngredientCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  name               String
+  /// Canonical inventory / costing unit for this ingredient (exactly one).
+  baseUnitId         String
+  baseUnit           Unit               @relation(fields: [baseUnitId], references: [id], onDelete: Restrict)
+  minimumStock       Decimal?           @db.Decimal(24, 6)
+  status             IngredientStatus   @default(ACTIVE)
+  /// Last received purchase unit cost in organization currency (optional until purchases exist).
+  latestPurchaseCost Decimal?           @db.Decimal(24, 6)
+  /// Current inventory valuation cost (MWAC); maintained by inventory workflows later.
+  valuationCost      Decimal?           @db.Decimal(24, 6)
+  notes              String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  archivedAt         DateTime?
+
+  @@unique([organizationId, name])
+  @@index([organizationId, status])
+  @@index([organizationId, categoryId])
+  @@index([baseUnitId])
+  @@map("ingredient")
 }
 
 model Member {
